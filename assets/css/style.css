@@ -28,12 +28,23 @@
      
  }
 
+ .navbar-container a {
+     padding: 15px;
+ }
+ .navbar-container a:hover {
+    background-color: blue;
+    color: white;
+    border-radius: 15px;
+
+ }
+
  .input h2{
      background-color:blue;
      display: inline-block;
      color: white;
      padding:25px 25px 25px 50px;
      margin-top: 50px;
+     border-radius: 0 15px 15px 0;
  }
 .input-box{
     display: flex;
@@ -71,10 +82,16 @@
      width: 6%;
      background-color: mediumslateblue;
      border: 3px solid blue;
+     border-radius: 15px;
      display: flex;
      justify-content: center;
      align-items: center;
      font-size: 3vw;
+ }
+
+ .pitches:hover{
+     background-image: radial-gradient(mediumslateblue,rgb(91, 27, 150));
+     border: 3px solid darkblue;
  }
 
  .mode-container{
@@ -91,5 +108,8 @@
     border-radius: 10px;
     padding: 3px;
     font-size: 20px;
+ }
+ button:hover{
+    background-image: radial-gradient(white,rgb(126, 117, 117));
  }
 
