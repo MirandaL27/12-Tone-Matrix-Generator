@@ -1,0 +1,92 @@
+.who-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.who-container p {
+    width: 50%;
+    font-size: 20px;
+    background-color: mediumslateblue;
+    padding: 10px;
+    border-radius: 15px;
+    border: 3px solid blue;
+}
+
+.who-container img{
+    border: 3px solid blue;
+    border-radius: 15px;
+}
+
+.the-row-container{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+.transformation-instructions-container {
+    width: 45%;
+    font-size: 20px;
+    background-color: mediumslateblue;
+    padding: 10px 10px 10px 30px;
+    border-radius: 15px;
+    border: 3px solid blue;
+}
+
+.row-transformations-container{
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.row-transformations-container h4{
+    margin-top: 10px;
+}
+
+.row-transformations-container img{
+    width: 100%;
+    border: 3px solid blue;
+    border-radius: 15px;
+}
+
+.rules-container{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.written-rules-container, .diagram-container{
+    width: 45%;
+    
+}
+
+.written-rules-container{
+    font-size: 20px;
+    background-color: mediumslateblue;
+    border: 3px solid blue;
+    border-radius: 15px;
+    padding: 10px 10px 10px 30px;
+}
+.more-info-container{
+    margin: 50px 50px 50px 50px;
+    padding: 10px 10px 10px 30px;
+    background-color: mediumslateblue;
+    border: 3px solid blue;
+    border-radius: 15px;
+
+}
+.more-info-container p {
+    font-size: 30px;
+}
+
+.more-info-container ul li a:hover{
+    background-color: blue;
+    color:cornflowerblue;
+    border-radius: 10px;
+}
+
+
