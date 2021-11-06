@@ -3,7 +3,10 @@ addOnClickFunctionToPrimeRow();
 var pitch = "C";
 var secondPitch = "C";
 var isFirstClick = true;
+var spellingMode = "sharp";
 var sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+var flatArray=["C","D&#9837", "D","E&#9837", "E", "F","G&#9837", "G", "A&#9837", "A","B&#9837", "B"];
+var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
 function getId(){
     if(isFirstClick){
         pitch = this.id;
@@ -74,6 +77,15 @@ function addOnClickFunctionToPrimeRow(){
 
     var reset = document.getElementById("reset-button");
     reset.onclick = resetPrimeRow;
+
+    reset = document.getElementById("sharp");
+    reset.onclick = respellAccidentals;
+
+    reset = document.getElementById("flat");
+    reset.onclick = respellAccidentals;
+
+    reset = document.getElementById("both");
+    reset.onclick = respellAccidentals;
 }
 
 function resetPrimeRow(){
@@ -99,6 +111,31 @@ function swapPitches(){
     pitch2.style.backgroundImage = null;
     pitch1.style.backgroundColor = "mediumslateblue";
     pitch2.style.backgroundColor = "mediumslateblue";
+}
+
+function respellAccidentals(){
+    spellingMode = this.id;
+    for(var i = 0; i < 12; i++){
+        if(spellingMode == "sharp"){
+            //go into each row block and change the text
+            var note = document.getElementById(sharpArray[i]);
+            note.innerHTML = "<p>"+ sharpArray[i]+"</p>";
+            note.style.fontSize = "3vw";
+            note.style.fontWeight = "normal";
+        }
+        else if(spellingMode == "flat"){
+            var note = document.getElementById(sharpArray[i]);
+            note.innerHTML = "<p>"+ flatArray[i]+"</p>";
+            note.style.fontSize = "3vw";
+            note.style.fontWeight = "normal";
+        }
+        else{
+            var note = document.getElementById(sharpArray[i]);
+            note.innerHTML = "<p>"+ bothArray[i]+"</p>";
+            note.style.fontSize = "1.5vw";
+            note.style.fontWeight = "Bold";
+        }
+    }
 }
 
 function getNumberFromPitch(p){
