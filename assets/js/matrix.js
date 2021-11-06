@@ -3,6 +3,7 @@ addOnClickFunctionToPrimeRow();
 var pitch = "C";
 var secondPitch = "C";
 var isFirstClick = true;
+var sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 function getId(){
     if(isFirstClick){
         pitch = this.id;
@@ -70,6 +71,18 @@ function addOnClickFunctionToPrimeRow(){
     primeRowPitch = document.getElementById("B");
     primeRowPitch.style.order = "11";
     primeRowPitch.onclick = getId;
+
+    var reset = document.getElementById("reset-button");
+    reset.onclick = resetPrimeRow;
+}
+
+function resetPrimeRow(){
+    //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
+    for(var i=0;i<sharpArray.length;i++){
+        var p = document.getElementById(sharpArray[i]);
+        console.log(sharpArray[i]);
+        p.style.order = getNumberFromPitch(sharpArray[i]).toString();
+    }
 }
 
 function swapPitches(){
@@ -89,6 +102,7 @@ function swapPitches(){
 }
 
 function getNumberFromPitch(p){
+    //switch statement correlating the pitches with integers
     switch (p){
         case "C":
             return 0;
