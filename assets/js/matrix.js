@@ -155,11 +155,34 @@ function getPrimeRowPitches(){
 
 function populateMatrix(){
     //compute matrix values and show matrix
-    for(var i=0; i<144;i++){
-        //loop through all the table cells and update their values.
+
+    //put prime row in first
+    for(var i =0;i <12; i++){
         var p = document.getElementById(i.toString());
-        
+        p.textContent = primeRowPitches[i];
     }
+    //then update the first column
+    for(var i=0; i<144;i+=12){
+        //inversion: 
+        if(i != 0){
+            var first = getNumberFromPitch(primeRowPitches[(i-12)/12]);
+            var second = getNumberFromPitch(primeRowPitches[((i-12)/12) + 1]);
+            var diff = second - first;
+            var p = document.getElementById(i.toString());
+            var prevP = document.getElementById((i-12).toString());
+            console.log();
+            var invertedDiff = getNumberFromPitch(prevP.textContent) - diff;
+            if(invertedDiff < 0){
+                invertedDiff+=12;
+            }
+            else if (invertedDiff>=12){
+                invertedDiff-=12;
+            }
+            p.textContent = sharpArray[invertedDiff];
+        }
+    }
+    //populate the rest of the table
+    
     //show matrix
     newDiv.style.display = "flex";
 }
