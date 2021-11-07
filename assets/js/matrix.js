@@ -1,3 +1,5 @@
+generateMatrix();
+
 addOnClickFunctionToPrimeRow();
 var pitch = "C";
 var secondPitch = "C";
@@ -7,6 +9,7 @@ var sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 var flatArray=["C","D&#9837", "D","E&#9837", "E", "F","G&#9837", "G", "A&#9837", "A","B&#9837", "B"];
 var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
 var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+var newDiv;
 function getId(){
     if(isFirstClick){
         pitch = this.id;
@@ -146,8 +149,59 @@ function getPrimeRowPitches(){
     var primeRowArray = primeRow.children;
     for(var i = 0; i<primeRowArray.length; i++){
         primeRowPitches[primeRowArray[i].style.order] = primeRowArray[i].id;
-        console.log(primeRowPitches);
     }
+    populateMatrix();
+}
+
+function populateMatrix(){
+    //compute matrix values and show matrix
+    for(var i=0; i<144;i++){
+        //loop through all the table cells and update their values.
+        var p = document.getElementById(i.toString());
+        
+    }
+    //show matrix
+    newDiv.style.display = "flex";
+}
+
+function generateMatrix(){
+    //generates and hides the HTML elements for the matrix
+    //make a div to contain the matrix - flexbox
+    newDiv = document.createElement("div");
+    newDiv.style = "justify-content: center; margin:20px; display:none;"//hide the matrix
+    let m = document.getElementById("matrix");
+    m.appendChild(newDiv);
+    //make the table
+    let newTable = document.createElement("table");
+    newTable.style = "border: 3px solid blue;";
+    for(var i = 0; i < 12; i++){
+        //make 12 table rows
+        let newRow = document.createElement("tr");
+        let newButtonCell = document.createElement("td");
+        let newButton = document.createElement("button");
+        newButton.type = "submit";
+        newButton.id = "play"+ i;
+        newButton.textContent = "Play";
+        newButton.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
+        newButtonCell.appendChild(newButton);
+        newRow.appendChild(newButtonCell);
+        for(var j = 0; j < 12; j++){
+            //make 12 table cells inside each row
+            //each one should contain a div flexbox with a paragraph element in it.
+            let newCell = document.createElement("td");
+            let newCellDiv = document.createElement("div");
+            newCellDiv.style = "display: flex; justify-content: center; align-items: center; width:3vw; background-color: mediumslateblue";
+            let newP = document.createElement("p");
+            newP.id = (12*i+j).toString();
+            newP.textContent = "0";
+            newP.style =  "font-size:23px;";
+            newCellDiv.appendChild(newP);
+            newCell.appendChild(newCellDiv);
+            newRow.appendChild(newCell);
+        }
+        newTable.appendChild(newRow);
+    }
+    newDiv.appendChild(newTable);
 }
 
 function getNumberFromPitch(p){
