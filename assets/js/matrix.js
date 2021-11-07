@@ -158,7 +158,7 @@ function populateMatrix(){
     //put prime row in first
     for(var i =0;i <12; i++){
         var p = document.getElementById(i.toString());
-        p.textContent = primeRowPitches[i];
+            p.textContent = primeRowPitches[i];
     }
     //then update the first column
     for(var i=0; i<144;i+=12){
@@ -176,7 +176,7 @@ function populateMatrix(){
             else if (invertedDiff>=12){
                 invertedDiff-=12;
             }
-            p.textContent = sharpArray[invertedDiff];
+            p.textContent = sharpArray[invertedDiff];      
         }
     }
     var offset=0;
@@ -197,7 +197,33 @@ function populateMatrix(){
         }
     }
     //show matrix
+    changeMatrixSpelling();
     newDiv.style.display = "flex";
+}
+
+function changeMatrixSpelling(){
+    //change to sharps, flats or both depending on spellingMode
+    for(var i=0;i<144;i++){
+        var p = document.getElementById(i.toString());
+        var str = p.textContent;
+        //console.log(str);
+        if(spellingMode == "sharp"){
+            p.textContent = sharpArray[getNumberFromPitch(str)];
+            p.style.fontSize = "23px";
+            p.style.fontWeight = "normal";
+        }
+        else if (spellingMode == "flat"){
+            console.log("flat");
+            p.innerHTML = flatArray[getNumberFromPitch(str)];
+            p.style.fontSize = "23px";
+            p.style.fontWeight = "normal";
+        }
+        else{
+            p.innerHTML = bothArray[getNumberFromPitch(str)];
+            p.style.fontSize = "10px";
+            p.style.fontWeight = "bold";
+        }      
+    }
 }
 
 function generateMatrix(){
@@ -245,25 +271,25 @@ function getNumberFromPitch(p){
     switch (p){
         case "C":
             return 0;
-        case "C#":
+        case "C#" ||"D&#9837" || "C#/D&#9837" || "D♭":
             return 1;
         case "D":
             return 2;
-        case "D#":
+        case "D#" || "E&#9837" || "D#/E&#9837" || "E♭":
             return 3;
         case "E":
             return 4;
         case "F":
             return 5;
-        case "F#":
+        case "F#" || "G&#9837" || "F#/G&#9837" || "G♭":
             return 6;
         case "G":
             return 7;
-        case "G#":
+        case "G#" || "A&#9837" || "G#/A&#9837" || "A♭":
             return 8;
         case "A":
             return 9;
-        case "A#":
+        case "A#" || "B&#9837" || "A#/B&#9837" || "B♭":
             return 10;
         case "B":
             return 11;                                 
