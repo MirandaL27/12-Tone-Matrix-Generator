@@ -1,4 +1,3 @@
-
 addOnClickFunctionToPrimeRow();
 var pitch = "C";
 var secondPitch = "C";
@@ -7,6 +6,7 @@ var spellingMode = "sharp";
 var sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 var flatArray=["C","D&#9837", "D","E&#9837", "E", "F","G&#9837", "G", "A&#9837", "A","B&#9837", "B"];
 var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
+var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 function getId(){
     if(isFirstClick){
         pitch = this.id;
@@ -86,6 +86,9 @@ function addOnClickFunctionToPrimeRow(){
 
     reset = document.getElementById("both");
     reset.onclick = respellAccidentals;
+
+    reset = document.getElementById("gen");
+    reset.onclick = getPrimeRowPitches;
 }
 
 function resetPrimeRow(){
@@ -135,6 +138,15 @@ function respellAccidentals(){
             note.style.fontSize = "1.5vw";
             note.style.fontWeight = "Bold";
         }
+    }
+}
+
+function getPrimeRowPitches(){
+    var primeRow = document.getElementById("input-container");
+    var primeRowArray = primeRow.children;
+    for(var i = 0; i<primeRowArray.length; i++){
+        primeRowPitches[primeRowArray[i].style.order] = primeRowArray[i].id;
+        console.log(primeRowPitches);
     }
 }
 
