@@ -128,3 +128,15 @@
     background-image: radial-gradient(white,rgb(126, 117, 117));
  }
 
+ .generate-button{
+     text-align: center;
+ }
+ 
+ .gen{
+    background-color:rgba(126, 117, 117, 0.5);
+    border: 3px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 30px;
+ }
+
