@@ -98,7 +98,6 @@ function resetPrimeRow(){
     //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
     for(var i=0;i<sharpArray.length;i++){
         var p = document.getElementById(sharpArray[i]);
-        console.log(sharpArray[i]);
         p.style.order = getNumberFromPitch(sharpArray[i]).toString();
     }
 }
@@ -170,7 +169,6 @@ function populateMatrix(){
             var diff = second - first;
             var p = document.getElementById(i.toString());
             var prevP = document.getElementById((i-12).toString());
-            console.log();
             var invertedDiff = getNumberFromPitch(prevP.textContent) - diff;
             if(invertedDiff < 0){
                 invertedDiff+=12;
@@ -181,8 +179,23 @@ function populateMatrix(){
             p.textContent = sharpArray[invertedDiff];
         }
     }
+    var offset=0;
     //populate the rest of the table
-    
+    for(var i = 12; i < 144; i++){
+        var p = document.getElementById(i.toString());
+        if(i%12 == 0){
+            //it's the first cell in the row, set offset for transposition
+            offset = getNumberFromPitch(p.textContent) - getNumberFromPitch(primeRowPitches[0]);
+            if(offset < 0){
+                offset += 12;
+            }
+        }
+        else{
+            //it's not the first cell in the row, transpose based on offset
+            var newPitch = (getNumberFromPitch(primeRowPitches[i%12]) + offset)%12;
+            p.textContent = sharpArray[newPitch];
+        }
+    }
     //show matrix
     newDiv.style.display = "flex";
 }
