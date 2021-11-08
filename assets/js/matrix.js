@@ -354,26 +354,31 @@ function getNumberFromPitch(p){
     }
 }
 
-function playRowNotes(){
-    //audio context
+async function playRowNotes(){
+    //audio context - https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     var audio = new AudioContext;
     
     //get matrix row number
     var row = this.id;
     row = row.replace("play","");
-    console.log(row);
     //get each pitch from the row
     for(var i  = row*12; i<(row*12 + 12);i++){
         var p = document.getElementById(i.toString());
         var num = getNumberFromPitch(p.textContent);
         var freq = pitchFrequencies[num];
+        //https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
         var osc = audio.createOscillator();
         osc.type = "sine";
         osc.connect(audio.destination);
         osc.frequency.setValueAtTime(freq, audio.currentTime);
         osc.start();   
-        debugger; // need to delay execution somehow
+        await delayExecution(1000);
         osc.stop();
     }
 }
+
+function delayExecution(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+  }
+//https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
