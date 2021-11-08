@@ -115,6 +115,15 @@ function resetPrimeRow(){
         var p = document.getElementById(sharpArray[i]);
         p.style.order = getNumberFromPitch(sharpArray[i]).toString();
     }
+    //hide matrix and disable print button
+
+    newDiv.style.display = "none";
+
+    canPrint = false;
+    var reset = document.getElementById("print-button");
+    reset.style.backgroundColor = "lightgrey";
+    reset.style.border = "3px solid grey";
+    reset.style.color = "darkgrey";
 }
 
 function swapPitches(){
