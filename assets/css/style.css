@@ -165,17 +165,11 @@
      .matrix-table{
          width: 500px;
          height: 500px;
-         /* border-collapse: collapse;*/
+         border-collapse: collapse;
      }
-     /* .matrix-div{
-        border: 3px solid black;
-     } */
      .matrix-cell{
-        border: 3px solid black;
+        border: 1px solid black;
      }
-
-     /* .matrix-row{
-     } */
 
  }
 
