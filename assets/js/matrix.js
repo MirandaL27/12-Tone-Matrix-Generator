@@ -11,6 +11,9 @@ var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "
 var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 var pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
 var newDiv;
+// window.AudioContext = window.AudioContext || window.webkitAudioContext;
+// var audio = new AudioContext;
+
 function getId(){
     if(isFirstClick){
         pitch = this.id;
@@ -355,16 +358,20 @@ function getNumberFromPitch(p){
 }
 
 async function playRowNotes(){
-    //audio context - https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    var audio = new AudioContext;
-    
-    //get matrix row number
     var row = this.id;
     row = row.replace("play","");
+    this.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+    //play row notes
+    //audio context - https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
+    //Oscillator not supported in IE!
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    var audio = new AudioContext;
+    //get matrix row number
+        
     //get each pitch from the row
     for(var i  = row*12; i<(row*12 + 12);i++){
         var p = document.getElementById(i.toString());
+        p.style.color = "blue";
         var num = getNumberFromPitch(p.textContent);
         var freq = pitchFrequencies[num];
         //https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
@@ -375,10 +382,13 @@ async function playRowNotes(){
         osc.start();   
         await delayExecution(1000);
         osc.stop();
+        p.style.color = "black";
     }
+    this.style.backgroundImage = null;
+    this.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
 }
 
-function delayExecution(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-  }
-//https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
+ function delayExecution(milliseconds) {
+     return new Promise(resolve => setTimeout(resolve, milliseconds));
+   }
+// //https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
