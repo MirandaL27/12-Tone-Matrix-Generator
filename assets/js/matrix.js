@@ -83,6 +83,7 @@ function addOnClickFunctionToPrimeRow(){
 
     reset = document.getElementById("sharp");
     reset.onclick = respellAccidentals;
+    reset.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
 
     reset = document.getElementById("flat");
     reset.onclick = respellAccidentals;
@@ -120,6 +121,7 @@ function swapPitches(){
 
 function respellAccidentals(){
     spellingMode = this.id;
+    resetModeButtons();
     for(var i = 0; i < 12; i++){
         if(spellingMode == "sharp"){
             //go into each row block and change the text
@@ -140,6 +142,36 @@ function respellAccidentals(){
             note.style.fontSize = "1.5vw";
             note.style.fontWeight = "Bold";
         }
+    }
+    changeMatrixSpelling()
+}
+
+function resetModeButtons(){
+    var sharpButton = document.getElementById("sharp");
+    var flatButton = document.getElementById("flat");
+    var bothButton = document.getElementById("both");
+    switch(spellingMode){
+        case "sharp":
+            sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+            flatButton.style.backgroundImage = null;
+            flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+            bothButton.style.backgroundImage = null;
+            bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+            break;
+        case "flat":
+            flatButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+            sharpButton.style.backgroundImage = null;
+            sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+            bothButton.style.backgroundImage = null;
+            bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+            break;
+        default:
+            bothButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+            flatButton.style.backgroundImage = null;
+            flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+            sharpButton.style.backgroundImage = null;
+            sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+            break;    
     }
 }
 
@@ -206,7 +238,7 @@ function changeMatrixSpelling(){
     for(var i=0;i<144;i++){
         var p = document.getElementById(i.toString());
         var str = p.textContent;
-        //console.log(str);
+        console.log(str);
         if(spellingMode == "sharp"){
             p.textContent = sharpArray[getNumberFromPitch(str)];
             p.style.fontSize = "23px";
@@ -271,25 +303,45 @@ function getNumberFromPitch(p){
     switch (p){
         case "C":
             return 0;
-        case "C#" ||"D&#9837" || "C#/D&#9837" || "D♭":
+        case "C#":
+        case "D&#9837":  
+        case "C#/D&#9837":
+        case "D♭": 
+        case "C#/D♭":
             return 1;
         case "D":
             return 2;
-        case "D#" || "E&#9837" || "D#/E&#9837" || "E♭":
+        case "D#":
+        case "E&#9837":
+        case "D#/E&#9837":
+        case "E♭":
+        case "D#/E♭":
             return 3;
         case "E":
             return 4;
         case "F":
             return 5;
-        case "F#" || "G&#9837" || "F#/G&#9837" || "G♭":
+        case "F#":
+        case "G&#9837": 
+        case "F#/G&#9837":
+        case "G♭":
+        case "F#/G♭":    
             return 6;
         case "G":
             return 7;
-        case "G#" || "A&#9837" || "G#/A&#9837" || "A♭":
+        case "G#":
+        case "A&#9837":
+        case "G#/A&#9837":
+        case "A♭":
+        case "G#/A♭":    
             return 8;
         case "A":
             return 9;
-        case "A#" || "B&#9837" || "A#/B&#9837" || "B♭":
+        case "A#":
+        case "B&#9837":
+        case "A#/B&#9837":
+        case "B♭":
+        case "A#/B♭":    
             return 10;
         case "B":
             return 11;                                 
