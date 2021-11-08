@@ -11,6 +11,7 @@ var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "
 var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 var pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
 var newDiv;
+var canPrint = false;
 // window.AudioContext = window.AudioContext || window.webkitAudioContext;
 // var audio = new AudioContext;
 
@@ -104,6 +105,9 @@ function addOnClickFunctionToPrimeRow(){
     }
 
     reset = document.getElementById("print-button");
+    reset.style.backgroundColor = "lightgrey";
+    reset.style.border = "3px solid grey";
+    reset.style.color = "darkgrey";
     reset.onclick = printDoc;
 }
 
@@ -243,6 +247,11 @@ function populateMatrix(){
     //show matrix
     changeMatrixSpelling();
     newDiv.style.display = "flex";
+    var printB = document.getElementById("print-button");
+    printB.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+    printB.style.border = "3px solid black";
+    printB.style.color = "black";
+    canPrint = true;
 }
 
 function changeMatrixSpelling(){
@@ -402,6 +411,7 @@ async function playRowNotes(){
 // //https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
 
 function printDoc(){
-   /// console.log("printing");
-    window.print();
+    if(canPrint){
+        window.print();
+    }
 }
