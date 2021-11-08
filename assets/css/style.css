@@ -64,19 +64,6 @@
      align-items: center;
  }
 
- /* .pitches:nth-child(1) {order: 0;}
- .pitches:nth-child(2) {order: 1;}
- .pitches:nth-child(3) {order: 2;}
- .pitches:nth-child(4) {order: 3;}
- .pitches:nth-child(5) {order: 4;}
- .pitches:nth-child(6) {order: 5;}
- .pitches:nth-child(7) {order: 6;}
- .pitches:nth-child(8) {order: 7;}
- .pitches:nth-child(9) {order: 8;}
- .pitches:nth-child(10) {order: 9;}
- .pitches:nth-child(11) {order: 10;}
- .pitches:nth-child(12) {order: 11;} */
-
  .reset-button-container{
      height: 150px;
      display: flex;

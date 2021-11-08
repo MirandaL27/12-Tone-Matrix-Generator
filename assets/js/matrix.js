@@ -1,6 +1,6 @@
 generateMatrix();
-
 addOnClickFunctionToPrimeRow();
+
 var pitch = "C";
 var secondPitch = "C";
 var isFirstClick = true;
@@ -12,8 +12,6 @@ var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 var pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
 var newDiv;
 var canPrint = false;
-// window.AudioContext = window.AudioContext || window.webkitAudioContext;
-// var audio = new AudioContext;
 
 function getId(){
     if(isFirstClick){
