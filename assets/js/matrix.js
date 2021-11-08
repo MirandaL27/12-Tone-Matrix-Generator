@@ -268,18 +268,21 @@ function changeMatrixSpelling(){
         var str = p.textContent;
         if(spellingMode == "sharp"){
             p.textContent = sharpArray[getNumberFromPitch(str)];
-            p.style.fontSize = "23px";
+            // p.style.fontSize = "23px";
+            p.style.fontSize = "2.5vw";
             p.style.fontWeight = "normal";
         }
         else if (spellingMode == "flat"){
             console.log("flat");
             p.innerHTML = flatArray[getNumberFromPitch(str)];
-            p.style.fontSize = "23px";
+            // p.style.fontSize = "23px";
+            p.style.fontSize = "2.5vw";
             p.style.fontWeight = "normal";
         }
         else{
             p.innerHTML = bothArray[getNumberFromPitch(str)];
-            p.style.fontSize = "10px";
+            //p.style.fontSize = "10px";
+            p.style.fontSize = "1.5vw";
             p.style.fontWeight = "bold";
         }      
     }
@@ -315,7 +318,7 @@ function generateMatrix(){
             let newCell = document.createElement("td");
             newCell.className = "matrix-cell";
             let newCellDiv = document.createElement("div");
-            newCellDiv.style = "display: flex; justify-content: center; align-items: center; width:3vw; background-color: mediumslateblue";
+            newCellDiv.style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
             newCellDiv.className = "matrix-div";
             let newP = document.createElement("p");
             newP.id = (12*i+j).toString();
