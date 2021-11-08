@@ -102,6 +102,9 @@ function addOnClickFunctionToPrimeRow(){
         reset = document.getElementById("play" + i);
         reset.onclick = playRowNotes;
     }
+
+    reset = document.getElementById("print-button");
+    reset.onclick = printDoc;
 }
 
 function resetPrimeRow(){
@@ -276,13 +279,16 @@ function generateMatrix(){
     //make the table
     let newTable = document.createElement("table");
     newTable.style = "border: 3px solid blue;";
+    newTable.className = "matrix-table";
     for(var i = 0; i < 12; i++){
         //make 12 table rows
         let newRow = document.createElement("tr");
+        newRow.className = "matrix-row";
         let newButtonCell = document.createElement("td");
         let newButton = document.createElement("button");
         newButton.type = "submit";
         newButton.id = "play"+ i;
+        newButton.className = "play-button";
         newButton.textContent = "Play";
         newButton.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
         newButtonCell.appendChild(newButton);
@@ -291,8 +297,10 @@ function generateMatrix(){
             //make 12 table cells inside each row
             //each one should contain a div flexbox with a paragraph element in it.
             let newCell = document.createElement("td");
+            newCell.className = "matrix-cell";
             let newCellDiv = document.createElement("div");
             newCellDiv.style = "display: flex; justify-content: center; align-items: center; width:3vw; background-color: mediumslateblue";
+            newCellDiv.className = "matrix-div";
             let newP = document.createElement("p");
             newP.id = (12*i+j).toString();
             newP.textContent = "0";
@@ -392,3 +400,8 @@ async function playRowNotes(){
      return new Promise(resolve => setTimeout(resolve, milliseconds));
    }
 // //https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
+
+function printDoc(){
+   /// console.log("printing");
+    window.print();
+}

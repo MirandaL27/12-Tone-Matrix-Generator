@@ -82,6 +82,7 @@
      display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
  }
  .reset-button{
     background-color:rgba(126, 117, 117, 0.5);
@@ -138,5 +139,43 @@
     border-radius: 10px;
     padding: 10px;
     font-size: 30px;
+ }
+
+ .print-button{
+    background-color:rgba(126, 117, 117, 0.5);
+    border: 3px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 23px;
+ }
+
+ @media print{
+     .input {
+         display:none;
+     }
+     header{
+         display:none;
+     }
+     .generate-button{
+         display: none;
+     }
+     .play-button{
+         display: none;
+     }
+     .matrix-table{
+         width: 500px;
+         height: 500px;
+         /* border-collapse: collapse;*/
+     }
+     /* .matrix-div{
+        border: 3px solid black;
+     } */
+     .matrix-cell{
+        border: 3px solid black;
+     }
+
+     /* .matrix-row{
+     } */
+
  }
 
