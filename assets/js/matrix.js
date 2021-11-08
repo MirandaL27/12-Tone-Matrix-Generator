@@ -9,6 +9,7 @@ var sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 var flatArray=["C","D&#9837", "D","E&#9837", "E", "F","G&#9837", "G", "A&#9837", "A","B&#9837", "B"];
 var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
 var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+var pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
 var newDiv;
 function getId(){
     if(isFirstClick){
@@ -93,6 +94,11 @@ function addOnClickFunctionToPrimeRow(){
 
     reset = document.getElementById("gen");
     reset.onclick = getPrimeRowPitches;
+
+    for(var i = 0; i < 12; i++){
+        reset = document.getElementById("play" + i);
+        reset.onclick = playRowNotes;
+    }
 }
 
 function resetPrimeRow(){
@@ -238,7 +244,6 @@ function changeMatrixSpelling(){
     for(var i=0;i<144;i++){
         var p = document.getElementById(i.toString());
         var str = p.textContent;
-        console.log(str);
         if(spellingMode == "sharp"){
             p.textContent = sharpArray[getNumberFromPitch(str)];
             p.style.fontSize = "23px";
@@ -346,5 +351,29 @@ function getNumberFromPitch(p){
         case "B":
             return 11;                                 
 
+    }
+}
+
+function playRowNotes(){
+    //audio context
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    var audio = new AudioContext;
+    
+    //get matrix row number
+    var row = this.id;
+    row = row.replace("play","");
+    console.log(row);
+    //get each pitch from the row
+    for(var i  = row*12; i<(row*12 + 12);i++){
+        var p = document.getElementById(i.toString());
+        var num = getNumberFromPitch(p.textContent);
+        var freq = pitchFrequencies[num];
+        var osc = audio.createOscillator();
+        osc.type = "sine";
+        osc.connect(audio.destination);
+        osc.frequency.setValueAtTime(freq, audio.currentTime);
+        osc.start();   
+        debugger; // need to delay execution somehow
+        osc.stop();
     }
 }
