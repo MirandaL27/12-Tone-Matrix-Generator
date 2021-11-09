@@ -1,5 +1,5 @@
-generateMatrix();
-addOnClickFunctionToPrimeRow();
+//generateMatrix();
+//addOnClickFunctionToPrimeRow();
 
 var pitch = "C";
 var secondPitch = "C";
@@ -102,11 +102,12 @@ function addOnClickFunctionToPrimeRow(){
         reset.onclick = playRowNotes;
     }
 
-    reset = document.getElementById("print-button");
-    reset.style.backgroundColor = "lightgrey";
-    reset.style.border = "3px solid grey";
-    reset.style.color = "darkgrey";
-    reset.onclick = printDoc;
+    // reset = document.getElementById("print-button");
+    // reset.style.backgroundColor = "lightgrey";
+    // reset.style.border = "3px solid grey";
+    // reset.style.color = "darkgrey";
+    printButton.disableButton();
+    printButton.button.onclick = printButton.printDoc;
 }
 
 function resetPrimeRow(){
@@ -117,13 +118,14 @@ function resetPrimeRow(){
     }
     //hide matrix and disable print button
 
-    newDiv.style.display = "none";
+    matrix.hideMatrix();
 
-    canPrint = false;
-    var reset = document.getElementById("print-button");
-    reset.style.backgroundColor = "lightgrey";
-    reset.style.border = "3px solid grey";
-    reset.style.color = "darkgrey";
+    printButton.canPrint = false;
+    printButton.disableButton()
+    // var reset = document.getElementById("print-button");
+    // reset.style.backgroundColor = "lightgrey";
+    // reset.style.border = "3px solid grey";
+    // reset.style.color = "darkgrey";
 }
 
 function swapPitches(){
@@ -204,134 +206,9 @@ function getPrimeRowPitches(){
     for(var i = 0; i<primeRowArray.length; i++){
         primeRowPitches[primeRowArray[i].style.order] = primeRowArray[i].id;
     }
-    populateMatrix();
+    matrix.populateMatrix();
 }
 
-function populateMatrix(){
-    //compute matrix values and show matrix
-
-    //put prime row in first
-    for(var i =0;i <12; i++){
-        var p = document.getElementById(i.toString());
-            p.textContent = primeRowPitches[i];
-    }
-    //then update the first column
-    for(var i=0; i<144;i+=12){
-        //inversion: 
-        if(i != 0){
-            var first = getNumberFromPitch(primeRowPitches[(i-12)/12]);
-            var second = getNumberFromPitch(primeRowPitches[((i-12)/12) + 1]);
-            var diff = second - first;
-            var p = document.getElementById(i.toString());
-            var prevP = document.getElementById((i-12).toString());
-            var invertedDiff = getNumberFromPitch(prevP.textContent) - diff;
-            if(invertedDiff < 0){
-                invertedDiff+=12;
-            }
-            else if (invertedDiff>=12){
-                invertedDiff-=12;
-            }
-            p.textContent = sharpArray[invertedDiff];      
-        }
-    }
-    var offset=0;
-    //populate the rest of the table
-    for(var i = 12; i < 144; i++){
-        var p = document.getElementById(i.toString());
-        if(i%12 == 0){
-            //it's the first cell in the row, set offset for transposition
-            offset = getNumberFromPitch(p.textContent) - getNumberFromPitch(primeRowPitches[0]);
-            if(offset < 0){
-                offset += 12;
-            }
-        }
-        else{
-            //it's not the first cell in the row, transpose based on offset
-            var newPitch = (getNumberFromPitch(primeRowPitches[i%12]) + offset)%12;
-            p.textContent = sharpArray[newPitch];
-        }
-    }
-    //show matrix
-    changeMatrixSpelling();
-    newDiv.style.display = "flex";
-    var printB = document.getElementById("print-button");
-    printB.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-    printB.style.border = "3px solid black";
-    printB.style.color = "black";
-    canPrint = true;
-}
-
-function changeMatrixSpelling(){
-    //change to sharps, flats or both depending on spellingMode
-    for(var i=0;i<144;i++){
-        var p = document.getElementById(i.toString());
-        var str = p.textContent;
-        if(spellingMode == "sharp"){
-            p.textContent = sharpArray[getNumberFromPitch(str)];
-            // p.style.fontSize = "23px";
-            p.style.fontSize = "2.5vw";
-            p.style.fontWeight = "normal";
-        }
-        else if (spellingMode == "flat"){
-            console.log("flat");
-            p.innerHTML = flatArray[getNumberFromPitch(str)];
-            // p.style.fontSize = "23px";
-            p.style.fontSize = "2.5vw";
-            p.style.fontWeight = "normal";
-        }
-        else{
-            p.innerHTML = bothArray[getNumberFromPitch(str)];
-            //p.style.fontSize = "10px";
-            p.style.fontSize = "1.5vw";
-            p.style.fontWeight = "bold";
-        }      
-    }
-}
-
-function generateMatrix(){
-    //generates and hides the HTML elements for the matrix
-    //make a div to contain the matrix - flexbox
-    newDiv = document.createElement("div");
-    newDiv.style = "justify-content: center; margin:20px; display:none;"//hide the matrix
-    let m = document.getElementById("matrix");
-    m.appendChild(newDiv);
-    //make the table
-    let newTable = document.createElement("table");
-    newTable.style = "border: 3px solid blue;";
-    newTable.className = "matrix-table";
-    for(var i = 0; i < 12; i++){
-        //make 12 table rows
-        let newRow = document.createElement("tr");
-        newRow.className = "matrix-row";
-        let newButtonCell = document.createElement("td");
-        let newButton = document.createElement("button");
-        newButton.type = "submit";
-        newButton.id = "play"+ i;
-        newButton.className = "play-button";
-        newButton.textContent = "Play";
-        newButton.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
-        newButtonCell.appendChild(newButton);
-        newRow.appendChild(newButtonCell);
-        for(var j = 0; j < 12; j++){
-            //make 12 table cells inside each row
-            //each one should contain a div flexbox with a paragraph element in it.
-            let newCell = document.createElement("td");
-            newCell.className = "matrix-cell";
-            let newCellDiv = document.createElement("div");
-            newCellDiv.style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
-            newCellDiv.className = "matrix-div";
-            let newP = document.createElement("p");
-            newP.id = (12*i+j).toString();
-            newP.textContent = "0";
-            newP.style =  "font-size:23px;";
-            newCellDiv.appendChild(newP);
-            newCell.appendChild(newCellDiv);
-            newRow.appendChild(newCell);
-        }
-        newTable.appendChild(newRow);
-    }
-    newDiv.appendChild(newTable);
-}
 
 function getNumberFromPitch(p){
     //switch statement correlating the pitches with integers
@@ -420,8 +297,206 @@ async function playRowNotes(){
    }
 // //https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
 
-function printDoc(){
-    if(canPrint){
-        window.print();
+// function printDoc(){
+//     if(canPrint){
+//         window.print();
+//     }
+// }
+
+
+
+
+var matrix = {
+    section: document.getElementById("matrix"),
+    containerDiv:document.createElement("div"),
+    table:document.createElement("table"),
+    rows: [],
+    cellDivs: [],
+    playButtons: [],
+    buttonCells: [],
+    cells : [],
+    ps : [],
+
+    generateMatrix(){
+        //generates and hides the HTML elements for the matrix
+        //make a div to contain the matrix - flexbox
+       this.styleContainerDiv();
+        this.section.appendChild(this.containerDiv);
+         //make the table
+        this.styleTable();
+        for(var i = 0; i < 12; i++){
+            //make 12 table rows
+            this.rows.push(document.createElement("tr"));
+
+            this.buttonCells.push(document.createElement("td"));
+            this.playButtons.push(document.createElement("button"));
+            this.styleButton(i);
+
+            this.buttonCells[i].appendChild(this.playButtons[i]);
+            this.rows[i].appendChild(this.buttonCells[i]);
+
+            for(var j = 0; j < 12; j++){
+                var index = (i*12) + j;
+                //make 12 table cells inside each row
+                //each one should contain a div flexbox with a paragraph element in it.
+                this.cells.push(document.createElement("td"));
+                this.styleCell(index);
+
+                this.cellDivs.push(document.createElement("div"));
+                this.styleCellDiv(index)
+
+                this.ps.push(document.createElement("p"));
+                this.styleP(index);
+
+                this.cellDivs[index].appendChild(this.ps[index]);
+                this.cells[index].appendChild(this.cellDivs[index]);
+                this.rows[i].appendChild(this.cells[index]);
+            }
+            this.table.appendChild(this.rows[i]);
+        }
+        this.containerDiv.appendChild(this.table);
+    },
+    styleContainerDiv(){
+        this.containerDiv.style = "justify-content: center; margin:20px; display:none;"//hide the matrix
+    },
+    styleTable(){
+        this.table.style = "border: 3px solid blue;";
+        this.table.className = "matrix-table";
+    },
+    styleRow(index){
+        this.rows[index].className = "matrix-row";
+    },
+    styleButton(index){
+        this.playButtons[index].type = "submit";
+        this.playButtons[index].id = "play"+ index;
+        this.playButtons[index].className = "play-button";
+        this.playButtons[index].textContent = "Play";
+        this.playButtons[index].style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
+    },
+    styleCellDiv(index){
+        this.cellDivs[index].style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
+        this.cellDivs[index].className = "matrix-div";
+    },
+    styleCell(index){
+        this.cells[index].className = "matrix-cell";
+    },
+    styleP(index){
+        this.ps[index].id = (index).toString();
+        this.ps[index].textContent = "0";
+        this.ps[index].style =  "font-size:23px;";
+    },
+
+    changeMatrixSpelling(){
+        //change to sharps, flats or both depending on spellingMode
+        for(var i=0;i<144;i++){
+            var p = this.ps[i];
+            var str = p.textContent;
+            if(spellingMode == "sharp"){
+                p.textContent = sharpArray[getNumberFromPitch(str)];
+                // p.style.fontSize = "23px";
+                p.style.fontSize = "2.5vw";
+                p.style.fontWeight = "normal";
+            }
+            else if (spellingMode == "flat"){
+                console.log("flat");
+                p.innerHTML = flatArray[getNumberFromPitch(str)];
+                // p.style.fontSize = "23px";
+                p.style.fontSize = "2.5vw";
+                p.style.fontWeight = "normal";
+            }
+            else{
+                p.innerHTML = bothArray[getNumberFromPitch(str)];
+                //p.style.fontSize = "10px";
+                p.style.fontSize = "1.5vw";
+                p.style.fontWeight = "bold";
+            }      
+        }
+    },
+
+    populateMatrix(){
+        //compute matrix values and show matrix
+    
+        //put prime row in first
+        for(var i =0;i <12; i++){
+            //var p = document.getElementById(i.toString());
+                this.ps[i].textContent = primeRowPitches[i];
+        }
+        //then update the first column
+        for(var i=0; i<144;i+=12){
+            //inversion: 
+            if(i != 0){
+                var first = getNumberFromPitch(primeRowPitches[(i-12)/12]);
+                var second = getNumberFromPitch(primeRowPitches[((i-12)/12) + 1]);
+                var diff = second - first;
+                var p = this.ps[i];
+                var prevP = this.ps[i-12];
+                var invertedDiff = getNumberFromPitch(prevP.textContent) - diff;
+                if(invertedDiff < 0){
+                    invertedDiff+=12;
+                }
+                else if (invertedDiff>=12){
+                    invertedDiff-=12;
+                }
+                p.textContent = sharpArray[invertedDiff];      
+            }
+        }
+        var offset=0;
+        //populate the rest of the table
+        for(var i = 12; i < 144; i++){
+            var p = this.ps[i];
+            if(i%12 == 0){
+                //it's the first cell in the row, set offset for transposition
+                offset = getNumberFromPitch(p.textContent) - getNumberFromPitch(primeRowPitches[0]);
+                if(offset < 0){
+                    offset += 12;
+                }
+            }
+            else{
+                //it's not the first cell in the row, transpose based on offset
+                var newPitch = (getNumberFromPitch(primeRowPitches[i%12]) + offset)%12;
+                p.textContent = sharpArray[newPitch];
+            }
+        }
+        //show matrix
+        this.changeMatrixSpelling();
+        this.showMatrix();
+
+        // var printB = document.getElementById("print-button");
+        // printB.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        // printB.style.border = "3px solid black";
+        // printB.style.color = "black";
+        printButton.canPrint = true;
+        console.log(printButton.canPrint);
+        printButton.enableButton();
+    },
+    hideMatrix(){
+        this.containerDiv.style.display = "none";
+    },
+    showMatrix(){
+        this.containerDiv.style.display = "flex";
     }
 }
+
+var printButton = {
+    button : document.getElementById("print-button"),
+    canPrint : false,
+    disableButton(){
+        this.button.style.backgroundColor = "lightgrey";
+        this.button.style.border = "3px solid grey";
+        this.button.style.color = "darkgrey";
+    },
+    enableButton(){
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.button.style.border = "3px solid black";
+        this.button.style.color = "black";
+    },
+    printDoc(){
+        console.log(canPrint);
+        if(canPrint){
+            window.print();
+        }
+    },
+}
+
+matrix.generateMatrix();
+addOnClickFunctionToPrimeRow();
