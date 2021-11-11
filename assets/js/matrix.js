@@ -260,10 +260,14 @@ function getNumberFromPitch(p){
     }
 }
 
-async function playRowNotes(){
-    var row = this.id;
+class audio{
+
+}
+
+async function playRowNotes(event, manager){
+    var row = event.id;
     row = row.replace("play","");
-    this.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+    event.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
     //play row notes
     //audio context - https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
     //Oscillator not supported in IE!
@@ -276,7 +280,7 @@ async function playRowNotes(){
         var p = document.getElementById(i.toString());
         p.style.color = "blue";
         var num = getNumberFromPitch(p.textContent);
-        var freq = pitchFrequencies[num];
+        var freq = manager.pitchArrays.pitchFrequencies[num];
         //https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
         var osc = audio.createOscillator();
         osc.type = "sine";
@@ -287,8 +291,8 @@ async function playRowNotes(){
         osc.stop();
         p.style.color = "black";
     }
-    this.style.backgroundImage = null;
-    this.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+    event.style.backgroundImage = null;
+    event.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
 }
 
  function delayExecution(milliseconds) {
@@ -467,8 +471,10 @@ async function playRowNotes(){
         this.containerDiv.style.display = "flex";
     }
     setOnClick(){
+        var manReference = this.matrixManager;
         for(var i = 0; i < this.playButtons.length; i++){
-            this.playButtons[i].onclick = playRowNotes;
+            //this.playButtons[i].onclick = playRowNotes;
+            this.playButtons[i].addEventListener("click",function() {playRowNotes(this, manReference)});
         }
     }
 }
