@@ -17,18 +17,18 @@ class matrixManager{
     generateMatrix(){
         this.matrix.generateMatrix();
     }
-    resetMatrix(){
-        this.primeRow.resetPrimeRow();
-        this.matrix.hideMatrix();
-        this.printButton.disableButton()
+    resetMatrix(event,manager){
+        manager.primeRow.resetPrimeRow();
+        manager.matrix.hideMatrix();
+        manager.printButton.disableButton()
     }
-    changeMatrixValues(){
-        this.primeRow.getPrimeRowPitches();
-        this.matrix.populateMatrix();
+    changeMatrixValues(event,manager){
+        manager.primeRow.getPrimeRowPitches();
+        manager.matrix.populateMatrix();
     }
-    changeMatrixSpellingMode(){
-        this.pitchArrays.respellAccidentals();
-        this.matrix.changeMatrixSpelling()
+    changeMatrixSpellingMode(event,manager){
+        manager.pitchArrays.respellAccidentals(event.id);
+        manager.matrix.changeMatrixSpelling()
     }
 
 }
@@ -41,8 +41,8 @@ class pitchArrays {
     pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
     spellingMode = "sharp";
     sharpButton = document.getElementById("sharp");
-    flatButton = document.getElementById("sharp");
-    bothButton = document.getElementById("sharp");
+    flatButton = document.getElementById("flat");
+    bothButton = document.getElementById("both");
     constructor(manager){
         this.matrixManager = manager;
     }
@@ -51,15 +51,17 @@ class pitchArrays {
         this.spellingMode = mode;
     }
     setOnClick(){
-        this.sharpButton.onclick = this.matrixManager.changeMatrixSpellingMode;
+        var manReference = this.matrixManager;
+        this.sharpButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
         this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
 
-        this.flatButton.onclick = this.matrixManager.changeMatrixSpellingMode;
+        this.flatButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
 
-        this.bothButton.onclick = this.matrixManager.changeMatrixSpellingMode;
+        this.bothButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
     }
-    respellAccidentals(){
-        this.spellingMode = this.id;
+    respellAccidentals(spelling){
+        this.spellingMode = spelling;
+        console.log(this.spellingMode);
         this.resetModeButtons();
         for(var i = 0; i < 12; i++){
             if(this.spellingMode == "sharp"){
@@ -118,7 +120,8 @@ class resetButton{
         this.matrixManager = manager;
     }
     setOnClick(){
-        this.button.onclick = this.matrixManager.resetMatrix;
+        var manReference = this.matrixManager;
+        this.button.addEventListener("click",function() {manReference.resetMatrix(this, manReference)});
     }
 }
 
@@ -129,7 +132,8 @@ class generateButton{
         this.matrixManager = manager;
     }
     setOnClick(){
-        this.button.onclick = this.matrixManager.changeMatrixValues;
+        var manReference = this.matrixManager;
+        this.button.addEventListener("click",function() {manReference.changeMatrixValues(this, manReference)});
     }
 }
 
@@ -199,7 +203,7 @@ class primeRow {
     }
     getPrimeRowPitches(){
         for(var i = 0; i<this.pitchButtons.length; i++){
-            primeRowPitches[this.pitchButtons[i].style.order] = this.pitchButtons[i].id;
+            this.primeRowPitches[this.pitchButtons[i].style.order] = this.pitchButtons[i].id;
         }
     }
 }
@@ -385,20 +389,20 @@ async function playRowNotes(){
             var p = this.ps[i];
 
             var str = p.textContent;
-            if(spellingMode == "sharp"){
-                p.textContent = this.pitchArrays.sharpArray[getNumberFromPitch(str)];
+            if(this.matrixManager.pitchArrays.spellingMode == "sharp"){
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[getNumberFromPitch(str)];
                 // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
-            else if (spellingMode == "flat"){
-                p.innerHTML = flatArray[getNumberFromPitch(str)];
+            else if (this.matrixManager.pitchArrays.spellingMode == "flat"){
+                p.innerHTML = this.matrixManager.pitchArrays.flatArray[getNumberFromPitch(str)];
                 // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else{
-                p.innerHTML = bothArray[getNumberFromPitch(str)];
+                p.innerHTML = this.matrixManager.pitchArrays.bothArray[getNumberFromPitch(str)];
                 //p.style.fontSize = "10px";
                 p.style.fontSize = "1.5vw";
                 p.style.fontWeight = "bold";
@@ -411,15 +415,15 @@ async function playRowNotes(){
     
         //put prime row in first
         for(var i =0;i <12; i++){
-            //var p = document.getElementById(i.toString());
-                this.ps[i].textContent = primeRowPitches[i];
+
+                this.ps[i].textContent = this.matrixManager.primeRow.primeRowPitches[i];
         }
         //then update the first column
         for(var i=0; i<144;i+=12){
             //inversion: 
             if(i != 0){
-                var first = getNumberFromPitch(primeRowPitches[(i-12)/12]);
-                var second = getNumberFromPitch(primeRowPitches[((i-12)/12) + 1]);
+                var first = getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i-12)/12]);
+                var second = getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[((i-12)/12) + 1]);
                 var diff = second - first;
                 var p = this.ps[i];
                 var prevP = this.ps[i-12];
@@ -439,14 +443,14 @@ async function playRowNotes(){
             var p = this.ps[i];
             if(i%12 == 0){
                 //it's the first cell in the row, set offset for transposition
-                offset = getNumberFromPitch(p.textContent) - getNumberFromPitch(primeRowPitches[0]);
+                offset = getNumberFromPitch(p.textContent) - getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
                 if(offset < 0){
                     offset += 12;
                 }
             }
             else{
                 //it's not the first cell in the row, transpose based on offset
-                var newPitch = (getNumberFromPitch(primeRowPitches[i%12]) + offset)%12;
+                var newPitch = (getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i%12]) + offset)%12;
                 p.textContent = this.pitchArrays.sharpArray[newPitch];
             }
         }
@@ -454,7 +458,7 @@ async function playRowNotes(){
         this.changeMatrixSpelling();
         this.setOnClick();
         this.showMatrix();
-        printButton.enableButton();
+        this.matrixManager.printButton.enableButton();
     }
     hideMatrix(){
         this.containerDiv.style.display = "none";
@@ -477,7 +481,8 @@ class printButton {
         this.matrixManager = manager;
     }
     setOnClick(){
-        this.button.onclick = this.printDoc;
+        var printReference = this
+        this.button.addEventListener("click",function() {printReference.printDoc(this, printReference)});
     }
     disableButton(){
         this.button.style.backgroundColor = "lightgrey";
@@ -491,8 +496,8 @@ class printButton {
         this.button.style.color = "black";
         this.canPrint = true;
     }
-    printDoc(){
-        if(canPrint){
+    printDoc(event,printRef){
+        if(printRef.canPrint){
             window.print();
         }
     }
