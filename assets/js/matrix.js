@@ -1,212 +1,207 @@
-//generateMatrix();
-//addOnClickFunctionToPrimeRow();
-
-var pitch = "C";
-var secondPitch = "C";
-var isFirstClick = true;
-var spellingMode = "sharp";
-var sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-var flatArray=["C","D&#9837", "D","E&#9837", "E", "F","G&#9837", "G", "A&#9837", "A","B&#9837", "B"];
-var bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
-var primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-var pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
-var newDiv;
-var canPrint = false;
-
-function getId(){
-    if(isFirstClick){
-        pitch = this.id;
-        //change style of clicked element to be hover background.
-        var primeRowPitch = document.getElementById(pitch);
-        primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
-        isFirstClick = false;
+class matrixManager{
+    //class that will handle all of the fucntion calls 
+    printButton = new printButton(this);
+    resetButton = new resetButton(this);
+    generateButton = new generateButton(this);
+    pitchArrays = new pitchArrays(this);
+    primeRow = new primeRow(this, this.pitchArrays);
+    matrix = new matrix(this, this.pitchArrays);
+    setOnClickForButtons(){
+        this.printButton.setOnClick();
+        this.printButton.disableButton();
+        this.resetButton.setOnClick();
+        this.generateButton.setOnClick();
+        this.pitchArrays.setOnClick();
+        this.primeRow.setOnClick();
     }
-    else{
-        secondPitch = this.id;
-        //change style of clicked element to be hover background.
-        var primeRowPitch = document.getElementById(secondPitch);
-        primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
-        swapPitches();
-        isFirstClick = true;
+    generateMatrix(){
+        this.matrix.generateMatrix();
     }
-}
-
-function addOnClickFunctionToPrimeRow(){
-
-    var primeRowPitch = document.getElementById("C");
-    primeRowPitch.style.order = "0";
-    primeRowPitch.onclick = getId;
-    
-    primeRowPitch = document.getElementById("C#");
-    primeRowPitch.style.order = "1";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("D");
-    primeRowPitch.style.order = "2";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("D#");
-    primeRowPitch.style.order = "3";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("E");
-    primeRowPitch.style.order = "4";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("F");
-    primeRowPitch.style.order = "5";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("F#");
-    primeRowPitch.style.order = "6";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("G");
-    primeRowPitch.style.order = "7";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("G#");
-    primeRowPitch.style.order = "8";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("A");
-    primeRowPitch.style.order = "9";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("A#");
-    primeRowPitch.style.order = "10";
-    primeRowPitch.onclick = getId;
-
-    primeRowPitch = document.getElementById("B");
-    primeRowPitch.style.order = "11";
-    primeRowPitch.onclick = getId;
-
-    var reset = document.getElementById("reset-button");
-    reset.onclick = resetPrimeRow;
-
-    reset = document.getElementById("sharp");
-    reset.onclick = respellAccidentals;
-    reset.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-
-    reset = document.getElementById("flat");
-    reset.onclick = respellAccidentals;
-
-    reset = document.getElementById("both");
-    reset.onclick = respellAccidentals;
-
-    reset = document.getElementById("gen");
-    reset.onclick = getPrimeRowPitches;
-
-    for(var i = 0; i < 12; i++){
-        reset = document.getElementById("play" + i);
-        reset.onclick = playRowNotes;
+    resetMatrix(){
+        this.primeRow.resetPrimeRow();
+        this.matrix.hideMatrix();
+        this.printButton.disableButton()
+    }
+    changeMatrixValues(){
+        this.primeRow.getPrimeRowPitches();
+        this.matrix.populateMatrix();
+    }
+    changeMatrixSpellingMode(){
+        this.pitchArrays.respellAccidentals();
+        this.matrix.changeMatrixSpelling()
     }
 
-    // reset = document.getElementById("print-button");
-    // reset.style.backgroundColor = "lightgrey";
-    // reset.style.border = "3px solid grey";
-    // reset.style.color = "darkgrey";
-    printButton.disableButton();
-    printButton.button.onclick = printButton.printDoc;
 }
 
-function resetPrimeRow(){
-    //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
-    for(var i=0;i<sharpArray.length;i++){
-        var p = document.getElementById(sharpArray[i]);
-        p.style.order = getNumberFromPitch(sharpArray[i]).toString();
+class pitchArrays {
+    matrixManager;
+    sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    flatArray=["C","D&#9837", "D","E&#9837", "E", "F","G&#9837", "G", "A&#9837", "A","B&#9837", "B"];
+    bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
+    pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
+    spellingMode = "sharp";
+    sharpButton = document.getElementById("sharp");
+    flatButton = document.getElementById("sharp");
+    bothButton = document.getElementById("sharp");
+    constructor(manager){
+        this.matrixManager = manager;
     }
-    //hide matrix and disable print button
 
-    matrix.hideMatrix();
+    setSpellingMode(mode){
+        this.spellingMode = mode;
+    }
+    setOnClick(){
+        this.sharpButton.onclick = this.matrixManager.changeMatrixSpellingMode;
+        this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
 
-    printButton.canPrint = false;
-    printButton.disableButton()
-    // var reset = document.getElementById("print-button");
-    // reset.style.backgroundColor = "lightgrey";
-    // reset.style.border = "3px solid grey";
-    // reset.style.color = "darkgrey";
-}
+        this.flatButton.onclick = this.matrixManager.changeMatrixSpellingMode;
 
-function swapPitches(){
-    pitch1 = document.getElementById(pitch);
-    pitch2 = document.getElementById(secondPitch);
-
-    //change order of two pitches
-    var temp = pitch1.style.order;
-    pitch1.style.order = pitch2.style.order;
-    pitch2.style.order = temp;
-
-    //change style back to default background
-    pitch1.style.backgroundImage = null;
-    pitch2.style.backgroundImage = null;
-    pitch1.style.backgroundColor = "mediumslateblue";
-    pitch2.style.backgroundColor = "mediumslateblue";
-}
-
-function respellAccidentals(){
-    spellingMode = this.id;
-    resetModeButtons();
-    for(var i = 0; i < 12; i++){
-        if(spellingMode == "sharp"){
-            //go into each row block and change the text
-            var note = document.getElementById(sharpArray[i]);
-            note.innerHTML = "<p>"+ sharpArray[i]+"</p>";
-            note.style.fontSize = "3vw";
-            note.style.fontWeight = "normal";
+        this.bothButton.onclick = this.matrixManager.changeMatrixSpellingMode;
+    }
+    respellAccidentals(){
+        this.spellingMode = this.id;
+        this.resetModeButtons();
+        for(var i = 0; i < 12; i++){
+            if(this.spellingMode == "sharp"){
+                //go into each row block and change the text
+                var note = document.getElementById(this.sharpArray[i]);
+                note.innerHTML = "<p>"+ this.sharpArray[i]+"</p>";
+                note.style.fontSize = "3vw";
+                note.style.fontWeight = "normal";
+            }
+            else if(this.spellingMode == "flat"){
+                var note = document.getElementById(this.sharpArray[i]);
+                note.innerHTML = "<p>"+ this.flatArray[i]+"</p>";
+                note.style.fontSize = "3vw";
+                note.style.fontWeight = "normal";
+            }
+            else{
+                var note = document.getElementById(this.sharpArray[i]);
+                note.innerHTML = "<p>"+ this.bothArray[i]+"</p>";
+                note.style.fontSize = "1.5vw";
+                note.style.fontWeight = "Bold";
+            }
         }
-        else if(spellingMode == "flat"){
-            var note = document.getElementById(sharpArray[i]);
-            note.innerHTML = "<p>"+ flatArray[i]+"</p>";
-            note.style.fontSize = "3vw";
-            note.style.fontWeight = "normal";
+    }
+    resetModeButtons(){
+        switch(this.spellingMode){
+            case "sharp":
+                this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+                this.flatButton.style.backgroundImage = null;
+                this.flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.bothButton.style.backgroundImage = null;
+                this.bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                break;
+            case "flat":
+                this.flatButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+                this.sharpButton.style.backgroundImage = null;
+                this.sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.bothButton.style.backgroundImage = null;
+                this.bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                break;
+            default:
+                this.bothButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+                this.flatButton.style.backgroundImage = null;
+                this.flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.style.backgroundImage = null;
+                this.sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                break;    
+        }
+    }
+
+}
+
+class resetButton{
+    matrixManager;
+    button = document.getElementById("reset-button");
+    constructor(manager){
+        this.matrixManager = manager;
+    }
+    setOnClick(){
+        this.button.onclick = this.matrixManager.resetMatrix;
+    }
+}
+
+class generateButton{
+    matrixManager;
+    button = document.getElementById("gen");
+    constructor(manager){
+        this.matrixManager = manager;
+    }
+    setOnClick(){
+        this.button.onclick = this.matrixManager.changeMatrixValues;
+    }
+}
+
+
+class primeRow {
+    matrixManager;
+    pitchArrays;
+    pitch = "C";
+    secondPitch = "C";
+    isFirstClick = true;
+    primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    pitchButtons = [];
+    constructor(manager, pitchmode){
+        this.matrixManager = manager;
+        this.pitchArrays = pitchmode
+    }
+    setOnClick(){
+        for(var i = 0; i<this.primeRowPitches.length;i++){
+            var pitch = document.getElementById(this.primeRowPitches[i]);
+            pitch.style.order = i;
+            var prReference = this;
+            pitch.addEventListener("click",function() {prReference.getId(this, prReference)});
+            this.pitchButtons.push(pitch);
+        }
+        return;
+    }
+
+    getId(event, primeRow){
+        if(primeRow.isFirstClick){
+            primeRow.pitch = event.id;
+            //change style of clicked element to be hover background.
+            var primeRowPitch = primeRow.pitchButtons[getNumberFromPitch(primeRow.pitch)];
+            primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
+            primeRow.isFirstClick = false;
         }
         else{
-            var note = document.getElementById(sharpArray[i]);
-            note.innerHTML = "<p>"+ bothArray[i]+"</p>";
-            note.style.fontSize = "1.5vw";
-            note.style.fontWeight = "Bold";
+            primeRow.secondPitch = event.id;
+            //change style of clicked element to be hover background.
+            var primeRowPitch = primeRow.pitchButtons[getNumberFromPitch(primeRow.secondPitch)];
+            primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
+            primeRow.swapPitches();
+            primeRow.isFirstClick = true;
         }
     }
-    changeMatrixSpelling()
-}
 
-function resetModeButtons(){
-    var sharpButton = document.getElementById("sharp");
-    var flatButton = document.getElementById("flat");
-    var bothButton = document.getElementById("both");
-    switch(spellingMode){
-        case "sharp":
-            sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-            flatButton.style.backgroundImage = null;
-            flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-            bothButton.style.backgroundImage = null;
-            bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-            break;
-        case "flat":
-            flatButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-            sharpButton.style.backgroundImage = null;
-            sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-            bothButton.style.backgroundImage = null;
-            bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-            break;
-        default:
-            bothButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-            flatButton.style.backgroundImage = null;
-            flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-            sharpButton.style.backgroundImage = null;
-            sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-            break;    
-    }
-}
+    swapPitches(){
+        this.pitch1 = this.pitchButtons[getNumberFromPitch(this.pitch)];
+        this.pitch2 = this.pitchButtons[getNumberFromPitch(this.secondPitch)];
 
-function getPrimeRowPitches(){
-    var primeRow = document.getElementById("input-container");
-    var primeRowArray = primeRow.children;
-    for(var i = 0; i<primeRowArray.length; i++){
-        primeRowPitches[primeRowArray[i].style.order] = primeRowArray[i].id;
+        //change order of two pitches
+        var temp = this.pitch1.style.order;
+        this.pitch1.style.order = this.pitch2.style.order;
+        this.pitch2.style.order = temp;
+    
+        //change style back to default background
+        this.pitch1.style.backgroundImage = null;
+        this.pitch2.style.backgroundImage = null;
+        this.pitch1.style.backgroundColor = "mediumslateblue";
+        this.pitch2.style.backgroundColor = "mediumslateblue";
     }
-    matrix.populateMatrix();
+    resetPrimeRow(){
+        //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
+        for(var i=0;i<this.pitchArrays.sharpArray.length;i++){
+            //var p = document.getElementById(pitchMode.sharpArray[i]);
+            this.pitchButtons[i].style.order = getNumberFromPitch(this.pitchArrays.sharpArray[i]).toString();
+        }
+    }
+    getPrimeRowPitches(){
+        for(var i = 0; i<this.pitchButtons.length; i++){
+            primeRowPitches[this.pitchButtons[i].style.order] = this.pitchButtons[i].id;
+        }
+    }
 }
 
 
@@ -297,26 +292,24 @@ async function playRowNotes(){
    }
 // //https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
 
-// function printDoc(){
-//     if(canPrint){
-//         window.print();
-//     }
-// }
 
 
-
-
-var matrix = {
-    section: document.getElementById("matrix"),
-    containerDiv:document.createElement("div"),
-    table:document.createElement("table"),
-    rows: [],
-    cellDivs: [],
-    playButtons: [],
-    buttonCells: [],
-    cells : [],
-    ps : [],
-
+ class matrix {
+     matrixManager;
+     pitchArrays;
+    section = document.getElementById("matrix")
+    containerDiv = document.createElement("div")
+    table = document.createElement("table")
+    rows = []
+    cellDivs = []
+    playButtons = []
+    buttonCells = []
+    cells = []
+    ps = []
+    constructor(manager, pitchMode){
+        this.matrixManager = manager;
+        this.pitchArrays = pitchMode;
+    }
     generateMatrix(){
         //generates and hides the HTML elements for the matrix
         //make a div to contain the matrix - flexbox
@@ -355,50 +348,50 @@ var matrix = {
             this.table.appendChild(this.rows[i]);
         }
         this.containerDiv.appendChild(this.table);
-    },
+    }
     styleContainerDiv(){
         this.containerDiv.style = "justify-content: center; margin:20px; display:none;"//hide the matrix
-    },
+    }
     styleTable(){
         this.table.style = "border: 3px solid blue;";
         this.table.className = "matrix-table";
-    },
+    }
     styleRow(index){
         this.rows[index].className = "matrix-row";
-    },
+    }
     styleButton(index){
         this.playButtons[index].type = "submit";
         this.playButtons[index].id = "play"+ index;
         this.playButtons[index].className = "play-button";
         this.playButtons[index].textContent = "Play";
         this.playButtons[index].style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
-    },
+    }
     styleCellDiv(index){
         this.cellDivs[index].style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
         this.cellDivs[index].className = "matrix-div";
-    },
+    }
     styleCell(index){
         this.cells[index].className = "matrix-cell";
-    },
+    }
     styleP(index){
         this.ps[index].id = (index).toString();
         this.ps[index].textContent = "0";
         this.ps[index].style =  "font-size:23px;";
-    },
+    }
 
     changeMatrixSpelling(){
         //change to sharps, flats or both depending on spellingMode
         for(var i=0;i<144;i++){
             var p = this.ps[i];
+
             var str = p.textContent;
             if(spellingMode == "sharp"){
-                p.textContent = sharpArray[getNumberFromPitch(str)];
+                p.textContent = this.pitchArrays.sharpArray[getNumberFromPitch(str)];
                 // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else if (spellingMode == "flat"){
-                console.log("flat");
                 p.innerHTML = flatArray[getNumberFromPitch(str)];
                 // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
@@ -411,7 +404,7 @@ var matrix = {
                 p.style.fontWeight = "bold";
             }      
         }
-    },
+    }
 
     populateMatrix(){
         //compute matrix values and show matrix
@@ -437,7 +430,7 @@ var matrix = {
                 else if (invertedDiff>=12){
                     invertedDiff-=12;
                 }
-                p.textContent = sharpArray[invertedDiff];      
+                p.textContent = this.pitchArrays.sharpArray[invertedDiff];      
             }
         }
         var offset=0;
@@ -454,49 +447,64 @@ var matrix = {
             else{
                 //it's not the first cell in the row, transpose based on offset
                 var newPitch = (getNumberFromPitch(primeRowPitches[i%12]) + offset)%12;
-                p.textContent = sharpArray[newPitch];
+                p.textContent = this.pitchArrays.sharpArray[newPitch];
             }
         }
         //show matrix
         this.changeMatrixSpelling();
+        this.setOnClick();
         this.showMatrix();
-
-        // var printB = document.getElementById("print-button");
-        // printB.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-        // printB.style.border = "3px solid black";
-        // printB.style.color = "black";
-        printButton.canPrint = true;
-        console.log(printButton.canPrint);
         printButton.enableButton();
-    },
+    }
     hideMatrix(){
         this.containerDiv.style.display = "none";
-    },
+    }
     showMatrix(){
         this.containerDiv.style.display = "flex";
     }
+    setOnClick(){
+        for(var i = 0; i < this.playButtons.length; i++){
+            this.playButtons[i].onclick = playRowNotes;
+        }
+    }
 }
 
-var printButton = {
-    button : document.getElementById("print-button"),
-    canPrint : false,
+class printButton {
+    matrixManager;
+    button = document.getElementById("print-button")
+    canPrint = false
+    constructor(manager){
+        this.matrixManager = manager;
+    }
+    setOnClick(){
+        this.button.onclick = this.printDoc;
+    }
     disableButton(){
         this.button.style.backgroundColor = "lightgrey";
         this.button.style.border = "3px solid grey";
         this.button.style.color = "darkgrey";
-    },
+        this.canPrint = false;
+    }
     enableButton(){
         this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
         this.button.style.border = "3px solid black";
         this.button.style.color = "black";
-    },
+        this.canPrint = true;
+    }
     printDoc(){
-        console.log(canPrint);
         if(canPrint){
             window.print();
         }
-    },
+    }
 }
 
-matrix.generateMatrix();
-addOnClickFunctionToPrimeRow();
+
+
+var manager = new matrixManager();
+
+manager.setOnClickForButtons();
+manager.generateMatrix();
+
+
+
+
