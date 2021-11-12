@@ -61,7 +61,6 @@ class pitchArrays {
     }
     respellAccidentals(spelling){
         this.spellingMode = spelling;
-        console.log(this.spellingMode);
         this.resetModeButtons();
         for(var i = 0; i < 12; i++){
             if(this.spellingMode == "sharp"){
@@ -197,7 +196,6 @@ class primeRow {
     resetPrimeRow(){
         //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
         for(var i=0;i<this.pitchArrays.sharpArray.length;i++){
-            //var p = document.getElementById(pitchMode.sharpArray[i]);
             this.pitchButtons[i].style.order = getNumberFromPitch(this.pitchArrays.sharpArray[i]).toString();
         }
     }
@@ -260,9 +258,11 @@ function getNumberFromPitch(p){
     }
 }
 
+
 class playButton {
     button;
     isStop = false;
+    isDisabled = false;
     changeToStopButton(){
         this.button.textContent = "Stop";
         this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
@@ -279,6 +279,69 @@ class playButton {
         buttonRef.button.style.backgroundImage = null;
         buttonRef.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
         buttonRef.isStop = false;
+    }
+    disableButton(){
+        this.isDisabled = true;
+        this.button.style.backgroundColor = "lightgrey";
+        this.button.style.border = "3px solid grey";
+        this.button.style.color = "darkgrey";
+    }
+    enableButton(){
+        this.isDisabled = false;
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.button.style.border = "3px solid black";
+        this.button.style.color = "black";
+    }
+}
+
+class playButtonManager{
+    buttons = [];
+    playingButton= 0;
+    addplayButton(button){
+        this.buttons.push(button);
+    }
+    getPlayButton(index){
+        return this.buttons[index];
+    }
+    addEventListenersToButtons(audioReference){
+        var buttonRef = this;
+        for(var i = 0; i < this.buttons.length; i++){
+        var audRef = audioReference[i];
+        this.buttons[i].button.addEventListener("click", function() { buttonRef.playAButton(this, audRef, buttonRef)});
+        }
+    }
+    playAButton(event, audioReference, buttons){
+        var row = event.id;
+        row = row.replace("play","");
+        if(buttons.buttons[row].isDisabled){
+            return;
+        }
+        
+        buttons.playingButton = row
+        buttons.disableButtons();
+        if(buttons.buttons[row].isStop){
+            buttons.enableButtons();
+        }
+        audioReference.playPitches(row,buttons);
+        
+    }
+    stopAButton(event, audioRef,buttons){
+        audioRef.playPitches(event, buttons);
+        buttons.enableButtons();
+        buttons.buttons[event].changeToPlayButtonNoRefs();
+    }
+    disableButtons(){
+        for(var i = 0; i< this.buttons.length;i++){
+            if(i == this.playingButton){
+                continue;
+            }
+            this.buttons[i].disableButton();
+        }
+    }
+    enableButtons(){
+        for(var i = 0; i< this.buttons.length;i++){
+            this.buttons[i].enableButton();
+        }
     }
 }
 
@@ -298,83 +361,39 @@ class audio{
             this.pitchArray.push(freq);   
         }
     }
-    async playPitches(event, audRef, buttons){
-        console.log(buttons);
-        var row = event.id;
-        row = row.replace("play","");
-        if(buttons[row].isStop){
-            audRef.stopPitches();
-            audRef.pitchArray.length = 0;
-            buttons[row].changeToPlayButtonNoRefs();
+    playPitches(row, buttons){
+        if(buttons.buttons[row].isDisabled){
             return;
         }
-        audRef.context = new AudioContext;
-        var row = event.id;
-        row = row.replace("play","");
+        if(buttons.buttons[row].isStop){
+            this.stopPitches(0,buttons, row);
+            this.pitchArray.length = 0;
+            return;
+        }
+        this.context = new AudioContext;
 
-        buttons[row].changeToStopButton();
+        buttons.buttons[row].changeToStopButton();
 
-        audRef.osc = this.context.createOscillator();
-        //this.playButtons[i].button.addEventListener("click", function() { audRef.playPitches(this, audRef, buttonRef)});
-        //audRef.osc.addEventListener("onended", function() {buttons[row].changeToPlayButton(this, buttons[row])});
-        audRef.osc.onended = function() {buttons[row].changeToPlayButton(this, buttons[row])};
-        audRef.osc.type = "sine";
+        this.osc = this.context.createOscillator();
+        var audioRef = this;
+        this.osc.onended = function() {buttons.stopAButton(row,audioRef,buttons)};
+        this.osc.type = "sine";
 
-        audRef.populatePitches(row);
-        console.log(audRef.pitchArray);
-        audRef.osc.connect(audRef.context.destination);
-        for(var i = 0; i < audRef.pitchArray.length; i++){
-            audRef.osc.frequency.setValueAtTime(audRef.pitchArray[i], audRef.context.currentTime + i);
+        this.populatePitches(row);
+        this.osc.connect(this.context.destination);
+        for(var i = 0; i < this.pitchArray.length; i++){
+            this.osc.frequency.setValueAtTime(this.pitchArray[i], this.context.currentTime + i);
             if (i == 0){
-                audRef.osc.start(); 
+                this.osc.start(); 
             }
         }
-        audRef.stopPitches(12)
-        //buttons[row].changeToPlayButton();
+        this.stopPitches(12,buttons, row)
         return;
     }
-    stopPitches(stopTime){
+    stopPitches(stopTime, buttons, index){
         this.osc.stop(stopTime);
     }
 }
-
-async function playRowNotes(event, manager){
-    var row = event.id;
-    row = row.replace("play","");
-    event.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-    //play row notes
-    //audio context - https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
-    //Oscillator not supported in IE!
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    var audio = new AudioContext;
-    //get matrix row number
-        
-    //get each pitch from the row
-    for(var i  = row*12; i<(row*12 + 12);i++){
-        var p = document.getElementById(i.toString());
-        p.style.color = "blue";
-        var num = getNumberFromPitch(p.textContent);
-        var freq = manager.pitchArrays.pitchFrequencies[num];
-        //https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode
-        var osc = audio.createOscillator();
-        osc.type = "sine";
-        osc.connect(audio.destination);
-        osc.frequency.setValueAtTime(freq, audio.currentTime);
-        osc.start();   
-        await delayExecution(1000);
-        osc.stop();
-        p.style.color = "black";
-    }
-    event.style.backgroundImage = null;
-    event.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-}
-
- function delayExecution(milliseconds) {
-     return new Promise(resolve => setTimeout(resolve, milliseconds));
-   }
-// //https://masteringjs.io/tutorials/fundamentals/wait-1-second-then
-
-
 
  class matrix {
      matrixManager;
@@ -384,7 +403,7 @@ async function playRowNotes(event, manager){
     table = document.createElement("table")
     rows = []
     cellDivs = []
-    playButtons = []
+    playButtons = new playButtonManager();
     buttonCells = []
     cells = []
     ps = []
@@ -410,10 +429,10 @@ async function playRowNotes(event, manager){
             this.buttonCells.push(document.createElement("td"));
             var playB = new playButton();
             playB.button = document.createElement("button");
-            this.playButtons.push(playB);
+            this.playButtons.addplayButton(playB);
             this.styleButton(i);
 
-            this.buttonCells[i].appendChild(this.playButtons[i].button);
+            this.buttonCells[i].appendChild(this.playButtons.getPlayButton(i).button);
             this.rows[i].appendChild(this.buttonCells[i]);
 
             for(var j = 0; j < 12; j++){
@@ -448,11 +467,12 @@ async function playRowNotes(event, manager){
         this.rows[index].className = "matrix-row";
     }
     styleButton(index){
-        this.playButtons[index].button.type = "submit";
-        this.playButtons[index].button.id = "play"+ index;
-        this.playButtons[index].button.className = "play-button";
-        this.playButtons[index].button.textContent = "Play";
-        this.playButtons[index].button.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
+        var button = this.playButtons.getPlayButton(index);
+        button.button.type = "submit";
+        button.button.id = "play"+ index;
+        button.button.className = "play-button";
+        button.button.textContent = "Play";
+        button.button.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
     }
     styleCellDiv(index){
         this.cellDivs[index].style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
@@ -551,15 +571,7 @@ async function playRowNotes(event, manager){
         this.containerDiv.style.display = "flex";
     }
     setOnClick(){
-        //var manReference = this.matrixManager;
-        for(var i = 0; i < this.playButtons.length; i++){
-            //this.playButtons[i].onclick = playRowNotes;
-            //this.playButtons[i].addEventListener("click",function() {playRowNotes(this, manReference)});
-            var audRef = this.audioArray[i];
-            var buttonRef = this.playButtons;
-            //console.log(buttonRef);
-            this.playButtons[i].button.addEventListener("click", function() { audRef.playPitches(this, audRef, buttonRef)});
-        }
+        this.playButtons.addEventListenersToButtons(this.audioArray)
     }
 }
 
