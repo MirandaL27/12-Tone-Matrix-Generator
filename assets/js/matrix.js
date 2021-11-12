@@ -30,6 +30,56 @@ class matrixManager{
         manager.pitchArrays.respellAccidentals(event.id);
         manager.matrix.changeMatrixSpelling()
     }
+    getNumberFromPitch(p){
+        //switch statement correlating the pitches with integers
+        switch (p){
+            case "C":
+                return 0;
+            case "C#":
+            case "D&#9837":  
+            case "C#/D&#9837":
+            case "D♭": 
+            case "C#/D♭":
+                return 1;
+            case "D":
+                return 2;
+            case "D#":
+            case "E&#9837":
+            case "D#/E&#9837":
+            case "E♭":
+            case "D#/E♭":
+                return 3;
+            case "E":
+                return 4;
+            case "F":
+                return 5;
+            case "F#":
+            case "G&#9837": 
+            case "F#/G&#9837":
+            case "G♭":
+            case "F#/G♭":    
+                return 6;
+            case "G":
+                return 7;
+            case "G#":
+            case "A&#9837":
+            case "G#/A&#9837":
+            case "A♭":
+            case "G#/A♭":    
+                return 8;
+            case "A":
+                return 9;
+            case "A#":
+            case "B&#9837":
+            case "A#/B&#9837":
+            case "B♭":
+            case "A#/B♭":    
+                return 10;
+            case "B":
+                return 11;                                 
+    
+        }
+    }
 
 }
 
@@ -164,14 +214,14 @@ class primeRow {
         if(primeRow.isFirstClick){
             primeRow.pitch = event.id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = primeRow.pitchButtons[getNumberFromPitch(primeRow.pitch)];
+            var primeRowPitch = primeRow.pitchButtons[this.matrixManager.getNumberFromPitch(primeRow.pitch)];
             primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
             primeRow.isFirstClick = false;
         }
         else{
             primeRow.secondPitch = event.id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = primeRow.pitchButtons[getNumberFromPitch(primeRow.secondPitch)];
+            var primeRowPitch = primeRow.pitchButtons[this.matrixManager.getNumberFromPitch(primeRow.secondPitch)];
             primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
             primeRow.swapPitches();
             primeRow.isFirstClick = true;
@@ -179,8 +229,8 @@ class primeRow {
     }
 
     swapPitches(){
-        this.pitch1 = this.pitchButtons[getNumberFromPitch(this.pitch)];
-        this.pitch2 = this.pitchButtons[getNumberFromPitch(this.secondPitch)];
+        this.pitch1 = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.pitch)];
+        this.pitch2 = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.secondPitch)];
 
         //change order of two pitches
         var temp = this.pitch1.style.order;
@@ -196,7 +246,7 @@ class primeRow {
     resetPrimeRow(){
         //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
         for(var i=0;i<this.pitchArrays.sharpArray.length;i++){
-            this.pitchButtons[i].style.order = getNumberFromPitch(this.pitchArrays.sharpArray[i]).toString();
+            this.pitchButtons[i].style.order = this.matrixManager.getNumberFromPitch(this.pitchArrays.sharpArray[i]).toString();
         }
     }
     getPrimeRowPitches(){
@@ -206,57 +256,6 @@ class primeRow {
     }
 }
 
-
-function getNumberFromPitch(p){
-    //switch statement correlating the pitches with integers
-    switch (p){
-        case "C":
-            return 0;
-        case "C#":
-        case "D&#9837":  
-        case "C#/D&#9837":
-        case "D♭": 
-        case "C#/D♭":
-            return 1;
-        case "D":
-            return 2;
-        case "D#":
-        case "E&#9837":
-        case "D#/E&#9837":
-        case "E♭":
-        case "D#/E♭":
-            return 3;
-        case "E":
-            return 4;
-        case "F":
-            return 5;
-        case "F#":
-        case "G&#9837": 
-        case "F#/G&#9837":
-        case "G♭":
-        case "F#/G♭":    
-            return 6;
-        case "G":
-            return 7;
-        case "G#":
-        case "A&#9837":
-        case "G#/A&#9837":
-        case "A♭":
-        case "G#/A♭":    
-            return 8;
-        case "A":
-            return 9;
-        case "A#":
-        case "B&#9837":
-        case "A#/B&#9837":
-        case "B♭":
-        case "A#/B♭":    
-            return 10;
-        case "B":
-            return 11;                                 
-
-    }
-}
 
 
 class playButton {
@@ -356,7 +355,7 @@ class audio{
     populatePitches(row){
         for(var i  = row*12; i<(row*12 + 12);i++){
             var p = document.getElementById(i.toString());
-            var num = getNumberFromPitch(p.textContent);
+            var num = this.matrixManager.getNumberFromPitch(p.textContent);
             var freq = manager.pitchArrays.pitchFrequencies[num];
             this.pitchArray.push(freq);   
         }
@@ -494,19 +493,19 @@ class audio{
 
             var str = p.textContent;
             if(this.matrixManager.pitchArrays.spellingMode == "sharp"){
-                p.textContent = this.matrixManager.pitchArrays.sharpArray[getNumberFromPitch(str)];
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[this.matrixManager.getNumberFromPitch(str)];
                 // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else if (this.matrixManager.pitchArrays.spellingMode == "flat"){
-                p.innerHTML = this.matrixManager.pitchArrays.flatArray[getNumberFromPitch(str)];
+                p.innerHTML = this.matrixManager.pitchArrays.flatArray[this.matrixManager.getNumberFromPitch(str)];
                 // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else{
-                p.innerHTML = this.matrixManager.pitchArrays.bothArray[getNumberFromPitch(str)];
+                p.innerHTML = this.matrixManager.pitchArrays.bothArray[this.matrixManager.getNumberFromPitch(str)];
                 //p.style.fontSize = "10px";
                 p.style.fontSize = "1.5vw";
                 p.style.fontWeight = "bold";
@@ -526,12 +525,12 @@ class audio{
         for(var i=0; i<144;i+=12){
             //inversion: 
             if(i != 0){
-                var first = getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i-12)/12]);
-                var second = getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[((i-12)/12) + 1]);
+                var first = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i-12)/12]);
+                var second = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[((i-12)/12) + 1]);
                 var diff = second - first;
                 var p = this.ps[i];
                 var prevP = this.ps[i-12];
-                var invertedDiff = getNumberFromPitch(prevP.textContent) - diff;
+                var invertedDiff = this.matrixManager.getNumberFromPitch(prevP.textContent) - diff;
                 if(invertedDiff < 0){
                     invertedDiff+=12;
                 }
@@ -547,14 +546,14 @@ class audio{
             var p = this.ps[i];
             if(i%12 == 0){
                 //it's the first cell in the row, set offset for transposition
-                offset = getNumberFromPitch(p.textContent) - getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
+                offset = this.matrixManager.getNumberFromPitch(p.textContent) - this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
                 if(offset < 0){
                     offset += 12;
                 }
             }
             else{
                 //it's not the first cell in the row, transpose based on offset
-                var newPitch = (getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i%12]) + offset)%12;
+                var newPitch = (this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i%12]) + offset)%12;
                 p.textContent = this.pitchArrays.sharpArray[newPitch];
             }
         }
