@@ -260,8 +260,73 @@ function getNumberFromPitch(p){
     }
 }
 
-class audio{
+class playButton {
+    button;
+    isStop = false;
+    changeToStopButton(){
+        this.button.textContent = "Stop";
+        this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+        this.isStop = true;
+    }
+    changeToPlayButton(){
+        this.button.textContent = "Play";
+        this.button.style.backgroundImage = null;
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.isStop = false;
+    }
+}
 
+class audio{
+    matrixManager;
+    context;
+    osc; 
+    pitchArray = [];
+    constructor(manager){
+        this.matrixManager = manager;
+    }
+    populatePitches(row){
+        for(var i  = row*12; i<(row*12 + 12);i++){
+            var p = document.getElementById(i.toString());
+            var num = getNumberFromPitch(p.textContent);
+            var freq = manager.pitchArrays.pitchFrequencies[num];
+            this.pitchArray.push(freq);   
+        }
+    }
+    async playPitches(event, audRef, buttons){
+        console.log(buttons);
+        var row = event.id;
+        row = row.replace("play","");
+        if(buttons[row].isStop){
+            audRef.stopPitches();
+            audRef.pitchArray.length = 0;
+            buttons[row].changeToPlayButton();
+            return;
+        }
+        audRef.context = new AudioContext;
+        var row = event.id;
+        row = row.replace("play","");
+
+        buttons[row].changeToStopButton();
+
+        audRef.osc = this.context.createOscillator();
+        audRef.osc.type = "sine";
+
+        audRef.populatePitches(row);
+        console.log(audRef.pitchArray);
+        audRef.osc.connect(audRef.context.destination);
+        for(var i = 0; i < audRef.pitchArray.length; i++){
+            audRef.osc.frequency.setValueAtTime(audRef.pitchArray[i], audRef.context.currentTime + i);
+            if (i == 0){
+                audRef.osc.start(); 
+            }
+        }
+        audRef.stopPitches(12)
+        //buttons[row].changeToPlayButton();
+        return;
+    }
+    stopPitches(stopTime){
+        this.osc.stop(stopTime);
+    }
 }
 
 async function playRowNotes(event, manager){
@@ -314,6 +379,7 @@ async function playRowNotes(event, manager){
     buttonCells = []
     cells = []
     ps = []
+    audioArray = []
     constructor(manager, pitchMode){
         this.matrixManager = manager;
         this.pitchArrays = pitchMode;
@@ -329,11 +395,16 @@ async function playRowNotes(event, manager){
             //make 12 table rows
             this.rows.push(document.createElement("tr"));
 
+            var aud = new audio(this.matrixManager);
+            this.audioArray.push(aud);
+
             this.buttonCells.push(document.createElement("td"));
-            this.playButtons.push(document.createElement("button"));
+            var playB = new playButton();
+            playB.button = document.createElement("button");
+            this.playButtons.push(playB);
             this.styleButton(i);
 
-            this.buttonCells[i].appendChild(this.playButtons[i]);
+            this.buttonCells[i].appendChild(this.playButtons[i].button);
             this.rows[i].appendChild(this.buttonCells[i]);
 
             for(var j = 0; j < 12; j++){
@@ -368,11 +439,11 @@ async function playRowNotes(event, manager){
         this.rows[index].className = "matrix-row";
     }
     styleButton(index){
-        this.playButtons[index].type = "submit";
-        this.playButtons[index].id = "play"+ index;
-        this.playButtons[index].className = "play-button";
-        this.playButtons[index].textContent = "Play";
-        this.playButtons[index].style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
+        this.playButtons[index].button.type = "submit";
+        this.playButtons[index].button.id = "play"+ index;
+        this.playButtons[index].button.className = "play-button";
+        this.playButtons[index].button.textContent = "Play";
+        this.playButtons[index].button.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
     }
     styleCellDiv(index){
         this.cellDivs[index].style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
@@ -471,10 +542,14 @@ async function playRowNotes(event, manager){
         this.containerDiv.style.display = "flex";
     }
     setOnClick(){
-        var manReference = this.matrixManager;
+        //var manReference = this.matrixManager;
         for(var i = 0; i < this.playButtons.length; i++){
             //this.playButtons[i].onclick = playRowNotes;
-            this.playButtons[i].addEventListener("click",function() {playRowNotes(this, manReference)});
+            //this.playButtons[i].addEventListener("click",function() {playRowNotes(this, manReference)});
+            var audRef = this.audioArray[i];
+            var buttonRef = this.playButtons;
+            //console.log(buttonRef);
+            this.playButtons[i].button.addEventListener("click", function() { audRef.playPitches(this, audRef, buttonRef)});
         }
     }
 }
