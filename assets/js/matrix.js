@@ -268,11 +268,17 @@ class playButton {
         this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
         this.isStop = true;
     }
-    changeToPlayButton(){
+    changeToPlayButtonNoRefs(){
         this.button.textContent = "Play";
         this.button.style.backgroundImage = null;
         this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
         this.isStop = false;
+    }
+    changeToPlayButton(event, buttonRef){
+        buttonRef.button.textContent = "Play";
+        buttonRef.button.style.backgroundImage = null;
+        buttonRef.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        buttonRef.isStop = false;
     }
 }
 
@@ -299,7 +305,7 @@ class audio{
         if(buttons[row].isStop){
             audRef.stopPitches();
             audRef.pitchArray.length = 0;
-            buttons[row].changeToPlayButton();
+            buttons[row].changeToPlayButtonNoRefs();
             return;
         }
         audRef.context = new AudioContext;
@@ -309,6 +315,9 @@ class audio{
         buttons[row].changeToStopButton();
 
         audRef.osc = this.context.createOscillator();
+        //this.playButtons[i].button.addEventListener("click", function() { audRef.playPitches(this, audRef, buttonRef)});
+        //audRef.osc.addEventListener("onended", function() {buttons[row].changeToPlayButton(this, buttons[row])});
+        audRef.osc.onended = function() {buttons[row].changeToPlayButton(this, buttons[row])};
         audRef.osc.type = "sine";
 
         audRef.populatePitches(row);
