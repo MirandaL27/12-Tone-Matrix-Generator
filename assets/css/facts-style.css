@@ -1,3 +1,7 @@
+span{
+ font-size: 15px;
+}
+
 .who-container {
     display: flex;
     justify-content: space-around;
