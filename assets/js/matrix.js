@@ -6,29 +6,53 @@ class matrixManager{
     pitchArrays = new pitchArrays(this);
     primeRow = new primeRow(this, this.pitchArrays);
     matrix = new matrix(this, this.pitchArrays);
+    pageContent = document.querySelector("body");
+
     setOnClickForButtons(){
-        this.printButton.setOnClick();
-        this.printButton.disableButton();
-        this.resetButton.setOnClick();
-        this.generateButton.setOnClick();
-        this.pitchArrays.setOnClick();
-        this.primeRow.setOnClick();
+        var manReference = this;
+        this.pageContent.addEventListener("click", function() {manReference.onClick(event)});
+        //this.pageContent.addEventListener("ended", function(){manReference.test});
+    }
+    // test(){
+    //     console.log("osc just ended!");
+    // }
+    onClick(event){
+        console.log(event.target.id);
+        if(event.target.id == "gen"){  
+            this.changeMatrixValues()
+        }
+        else if (event.target.id == "reset-button"){
+            this.resetMatrix()
+        }
+        else if (event.target.id == "print-button"){
+            this.printButton.printDoc();
+        }
+        else if(event.target.id == "sharp" || event.target.id == "flat" || event.target.id == "both"){
+                this.changeMatrixSpellingMode(event.target.id);
+        }
+        else if(event.target.className == "pitches" ){
+                this.primeRow.getId(event.target.id);
+        }
+        else if (event.target.className == "pitchesP"){
+            this.primeRow.getId(event.path[1].id);
+        }
+        return;
     }
     generateMatrix(){
         this.matrix.generateMatrix();
     }
-    resetMatrix(event,manager){
-        manager.primeRow.resetPrimeRow();
-        manager.matrix.hideMatrix();
-        manager.printButton.disableButton()
+    resetMatrix(){
+        this.primeRow.resetPrimeRow();
+        this.matrix.hideMatrix();
+        this.printButton.disableButton()
     }
-    changeMatrixValues(event,manager){
-        manager.primeRow.getPrimeRowPitches();
-        manager.matrix.populateMatrix();
+    changeMatrixValues(){
+        this.primeRow.getPrimeRowPitches();
+        this.matrix.populateMatrix();
     }
-    changeMatrixSpellingMode(event,manager){
-        manager.pitchArrays.respellAccidentals(event.id);
-        manager.matrix.changeMatrixSpelling()
+    changeMatrixSpellingMode(mode){
+        this.pitchArrays.respellAccidentals(mode);
+        this.matrix.changeMatrixSpelling()
     }
     getNumberFromPitch(p){
         //switch statement correlating the pitches with integers
@@ -95,19 +119,11 @@ class pitchArrays {
     bothButton = document.getElementById("both");
     constructor(manager){
         this.matrixManager = manager;
+        this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
     }
 
     setSpellingMode(mode){
         this.spellingMode = mode;
-    }
-    setOnClick(){
-        var manReference = this.matrixManager;
-        this.sharpButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
-        this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-
-        this.flatButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
-
-        this.bothButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
     }
     respellAccidentals(spelling){
         this.spellingMode = spelling;
@@ -168,10 +184,6 @@ class resetButton{
     constructor(manager){
         this.matrixManager = manager;
     }
-    setOnClick(){
-        var manReference = this.matrixManager;
-        this.button.addEventListener("click",function() {manReference.resetMatrix(this, manReference)});
-    }
 }
 
 class generateButton{
@@ -179,10 +191,6 @@ class generateButton{
     button = document.getElementById("gen");
     constructor(manager){
         this.matrixManager = manager;
-    }
-    setOnClick(){
-        var manReference = this.matrixManager;
-        this.button.addEventListener("click",function() {manReference.changeMatrixValues(this, manReference)});
     }
 }
 
@@ -198,33 +206,29 @@ class primeRow {
     constructor(manager, pitchmode){
         this.matrixManager = manager;
         this.pitchArrays = pitchmode
-    }
-    setOnClick(){
         for(var i = 0; i<this.primeRowPitches.length;i++){
             var pitch = document.getElementById(this.primeRowPitches[i]);
             pitch.style.order = i;
-            var prReference = this;
-            pitch.addEventListener("click",function() {prReference.getId(this, prReference)});
             this.pitchButtons.push(pitch);
         }
-        return;
+        return; 
     }
 
-    getId(event, primeRow){
-        if(primeRow.isFirstClick){
-            primeRow.pitch = event.id;
+    getId(id){
+        if(this.isFirstClick){
+            this.pitch = id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = primeRow.pitchButtons[this.matrixManager.getNumberFromPitch(primeRow.pitch)];
+            var primeRowPitch = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.pitch)];
             primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
-            primeRow.isFirstClick = false;
+            this.isFirstClick = false;
         }
         else{
-            primeRow.secondPitch = event.id;
+            this.secondPitch = id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = primeRow.pitchButtons[this.matrixManager.getNumberFromPitch(primeRow.secondPitch)];
+            var primeRowPitch = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.secondPitch)];
             primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
-            primeRow.swapPitches();
-            primeRow.isFirstClick = true;
+            this.swapPitches();
+            this.isFirstClick = true;
         }
     }
 
@@ -494,19 +498,16 @@ class audio{
             var str = p.textContent;
             if(this.matrixManager.pitchArrays.spellingMode == "sharp"){
                 p.textContent = this.matrixManager.pitchArrays.sharpArray[this.matrixManager.getNumberFromPitch(str)];
-                // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else if (this.matrixManager.pitchArrays.spellingMode == "flat"){
                 p.innerHTML = this.matrixManager.pitchArrays.flatArray[this.matrixManager.getNumberFromPitch(str)];
-                // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else{
                 p.innerHTML = this.matrixManager.pitchArrays.bothArray[this.matrixManager.getNumberFromPitch(str)];
-                //p.style.fontSize = "10px";
                 p.style.fontSize = "1.5vw";
                 p.style.fontWeight = "bold";
             }      
@@ -580,10 +581,7 @@ class printButton {
     canPrint = false
     constructor(manager){
         this.matrixManager = manager;
-    }
-    setOnClick(){
-        var printReference = this
-        this.button.addEventListener("click",function() {printReference.printDoc(this, printReference)});
+        this.disableButton();
     }
     disableButton(){
         this.button.style.backgroundColor = "lightgrey";
@@ -597,8 +595,8 @@ class printButton {
         this.button.style.color = "black";
         this.canPrint = true;
     }
-    printDoc(event,printRef){
-        if(printRef.canPrint){
+    printDoc(){
+        if(this.canPrint){
             window.print();
         }
     }
@@ -611,6 +609,8 @@ var manager = new matrixManager();
 manager.setOnClickForButtons();
 manager.generateMatrix();
 
-
+//var pageContentEl = document.querySelector("#page-content");
+// pageContentEl.addEventListener("click", taskButtonHandler);
+// pageContentEl.addEventListener("change", taskStatusChangeHandler);
 
 
