@@ -1,11 +1,11 @@
 class matrixManager{
     //class that will handle all of the fucntion calls 
-    printButton = new printButton(this,true,"print-button");
-    resetButton = new button(this, false, "reset-button");
-    generateButton = new button(this, false, "gen");
+    printButton = new printButton(true,"print-button");
+    resetButton = new button(false, "reset-button");
+    generateButton = new button(false, "gen");
     pitchArrays = new pitchArrays(this);
-    primeRow = new primeRow(this, this.pitchArrays);
-    matrix = new matrix(this, this.pitchArrays);
+    primeRow = new primeRow(this);
+    matrix = new matrix(this);
     pageContent = document.querySelector("body");
 
     setOnClickForButtons(){
@@ -116,8 +116,7 @@ class button{
     button;
     isDisabled;
     matrixManager;
-    constructor(manager = null,isDisabledInitially = false, id = null){
-        this.matrixManager = manager;
+    constructor(isDisabledInitially = false, id = null){
         this.isDisabled = isDisabledInitially;
         this.button = document.getElementById(id);
         if(this.isDisabled){
@@ -153,9 +152,9 @@ class pitchArrays {
     bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
     pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
     spellingMode = "sharp";
-    sharpButton = new button(this.matrixManager, false, "sharp");
-    flatButton = new button(this.matrixManager, false, "flat");
-    bothButton = new button(this.matrixManager, false, "both");
+    sharpButton = new button( false, "sharp");
+    flatButton = new button( false, "flat");
+    bothButton = new button( false, "both");
     constructor(manager){
         this.matrixManager = manager;
         this.sharpButton.select();
@@ -220,9 +219,9 @@ class primeRow {
     isFirstClick = true;
     primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
     pitchButtons = [];
-    constructor(manager, pitchmode){
+    constructor(manager){
         this.matrixManager = manager;
-        this.pitchArrays = pitchmode
+        this.pitchArrays = this.matrixManager.pitchArrays;
         for(var i = 0; i<this.primeRowPitches.length;i++){
             var pitch = document.getElementById(this.primeRowPitches[i]);
             pitch.style.order = i;
@@ -414,9 +413,9 @@ class audio{
     buttonCells = []
     cells = []
     ps = []
-    constructor(manager, pitchMode){
+    constructor(manager){
         this.matrixManager = manager;
-        this.pitchArrays = pitchMode;
+        this.pitchArrays = this.matrixManager.pitchArrays;
         this.playButtons = new playButtonManager(this.matrixManager);
     }
     generateMatrix(){
