@@ -283,13 +283,12 @@ class playButton extends button {
     isStop = false;
     changeToStopButton(){
         this.button.textContent = "Stop";
-        this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+        this.select();
         this.isStop = true;
     }
     changeToPlayButton(){
         this.button.textContent = "Play";
-        this.button.style.backgroundImage = null;
-        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.deselect();
         this.isStop = false;
     }
 }
