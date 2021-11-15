@@ -11,11 +11,7 @@ class matrixManager{
     setOnClickForButtons(){
         var manReference = this;
         this.pageContent.addEventListener("click", function() {manReference.onClick(event)});
-        //this.pageContent.addEventListener("ended", function(){manReference.test});
     }
-    // test(){
-    //     console.log("osc just ended!");
-    // }
     onClick(event){
         console.log(event.target.id);
         if(event.target.id == "gen"){  
@@ -36,6 +32,12 @@ class matrixManager{
         else if (event.target.className == "pitchesP"){
             this.primeRow.getId(event.path[1].id);
         }
+        else if (event.target.id.toString().includes("play")){
+            var index = parseInt(event.target.id.replace("play",""));
+            console.log(index);
+            this.matrix.invokePlayButtonManager(index);
+        }
+
         return;
     }
     generateMatrix(){
@@ -299,33 +301,28 @@ class playButton {
 
 class playButtonManager{
     buttons = [];
+    audioRef = [];
     playingButton= 0;
     addplayButton(button){
         this.buttons.push(button);
     }
+    addAudio(audio){
+        this.audioRef.push(audio);
+    }
     getPlayButton(index){
         return this.buttons[index];
     }
-    addEventListenersToButtons(audioReference){
-        var buttonRef = this;
-        for(var i = 0; i < this.buttons.length; i++){
-        var audRef = audioReference[i];
-        this.buttons[i].button.addEventListener("click", function() { buttonRef.playAButton(this, audRef, buttonRef)});
-        }
-    }
-    playAButton(event, audioReference, buttons){
-        var row = event.id;
-        row = row.replace("play","");
-        if(buttons.buttons[row].isDisabled){
+    playAButton(index){
+        if(this.buttons[index].isDisabled){
             return;
         }
         
-        buttons.playingButton = row
-        buttons.disableButtons();
-        if(buttons.buttons[row].isStop){
-            buttons.enableButtons();
+        this.playingButton = index
+        this.disableButtons();
+        if(this.buttons[index].isStop){
+            this.enableButtons();
         }
-        audioReference.playPitches(row,buttons);
+        this.audioRef[index].playPitches(index,this);
         
     }
     stopAButton(event, audioRef,buttons){
@@ -410,7 +407,6 @@ class audio{
     buttonCells = []
     cells = []
     ps = []
-    audioArray = []
     constructor(manager, pitchMode){
         this.matrixManager = manager;
         this.pitchArrays = pitchMode;
@@ -427,7 +423,7 @@ class audio{
             this.rows.push(document.createElement("tr"));
 
             var aud = new audio(this.matrixManager);
-            this.audioArray.push(aud);
+            this.playButtons.addAudio(aud);
 
             this.buttonCells.push(document.createElement("td"));
             var playB = new playButton();
@@ -560,7 +556,6 @@ class audio{
         }
         //show matrix
         this.changeMatrixSpelling();
-        this.setOnClick();
         this.showMatrix();
         this.matrixManager.printButton.enableButton();
     }
@@ -570,8 +565,9 @@ class audio{
     showMatrix(){
         this.containerDiv.style.display = "flex";
     }
-    setOnClick(){
-        this.playButtons.addEventListenersToButtons(this.audioArray)
+    invokePlayButtonManager(index){
+        console.log("call play button stuff here!");
+        this.playButtons.playAButton(index)
     }
 }
 
