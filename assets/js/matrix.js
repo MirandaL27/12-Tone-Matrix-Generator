@@ -1,8 +1,8 @@
 class matrixManager{
     //class that will handle all of the fucntion calls 
-    printButton = new printButton(this);
-    resetButton = new resetButton(this);
-    generateButton = new generateButton(this);
+    printButton = new printButton(this,true,"print-button");
+    resetButton = new button(this, false, "reset-button");
+    generateButton = new button(this, false, "gen");
     pitchArrays = new pitchArrays(this);
     primeRow = new primeRow(this, this.pitchArrays);
     matrix = new matrix(this, this.pitchArrays);
@@ -47,7 +47,7 @@ class matrixManager{
         this.primeRow.resetPrimeRow();
         this.matrix.stopPlayingRow()
         this.matrix.hideMatrix();
-        this.printButton.disableButton()
+        this.printButton.disable()
     }
     changeMatrixValues(){
         this.matrix.stopPlayingRow();
@@ -111,6 +111,41 @@ class matrixManager{
 
 }
 
+//button base class that all buttons inherit from.
+class button{
+    button;
+    isDisabled;
+    matrixManager;
+    constructor(manager = null,isDisabledInitially = false, id = null){
+        this.matrixManager = manager;
+        this.isDisabled = isDisabledInitially;
+        this.button = document.getElementById(id);
+        if(this.isDisabled){
+            this.disable();
+        }
+        return;
+    }
+    select(){
+        this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+    }
+    deselect(){
+        this.button.style.backgroundImage = null;
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+    }
+    disable(){
+        this.isDisabled = true;
+        this.button.style.backgroundColor = "lightgrey";
+        this.button.style.border = "3px solid grey";
+        this.button.style.color = "darkgrey";
+    }
+    enable(){
+        this.isDisabled = false;
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.button.style.border = "3px solid black";
+        this.button.style.color = "black";
+    }
+}
+
 class pitchArrays {
     matrixManager;
     sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
@@ -118,12 +153,12 @@ class pitchArrays {
     bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
     pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
     spellingMode = "sharp";
-    sharpButton = document.getElementById("sharp");
-    flatButton = document.getElementById("flat");
-    bothButton = document.getElementById("both");
+    sharpButton = new button(this.matrixManager, false, "sharp");
+    flatButton = new button(this.matrixManager, false, "flat");
+    bothButton = new button(this.matrixManager, false, "both");
     constructor(manager){
         this.matrixManager = manager;
-        this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+        this.sharpButton.select();
     }
 
     setSpellingMode(mode){
@@ -155,49 +190,27 @@ class pitchArrays {
         }
     }
     resetModeButtons(){
+        console.log(this.spellingMode);
         switch(this.spellingMode){
             case "sharp":
-                this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-                this.flatButton.style.backgroundImage = null;
-                this.flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-                this.bothButton.style.backgroundImage = null;
-                this.bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.select();
+                this.flatButton.deselect();
+                this.bothButton.deselect();
                 break;
             case "flat":
-                this.flatButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-                this.sharpButton.style.backgroundImage = null;
-                this.sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-                this.bothButton.style.backgroundImage = null;
-                this.bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.deselect();
+                this.flatButton.select();
+                this.bothButton.deselect();
                 break;
             default:
-                this.bothButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-                this.flatButton.style.backgroundImage = null;
-                this.flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-                this.sharpButton.style.backgroundImage = null;
-                this.sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.deselect();
+                this.flatButton.deselect();
+                this.bothButton.select();
                 break;    
         }
     }
 
 }
-
-class resetButton{
-    matrixManager;
-    button = document.getElementById("reset-button");
-    constructor(manager){
-        this.matrixManager = manager;
-    }
-}
-
-class generateButton{
-    matrixManager;
-    button = document.getElementById("gen");
-    constructor(manager){
-        this.matrixManager = manager;
-    }
-}
-
 
 class primeRow {
     matrixManager;
@@ -266,10 +279,9 @@ class primeRow {
 
 
 
-class playButton {
+class playButton extends button {
     button;
     isStop = false;
-    isDisabled = false;
     changeToStopButton(){
         this.button.textContent = "Stop";
         this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
@@ -280,18 +292,6 @@ class playButton {
         this.button.style.backgroundImage = null;
         this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
         this.isStop = false;
-    }
-    disableButton(){
-        this.isDisabled = true;
-        this.button.style.backgroundColor = "lightgrey";
-        this.button.style.border = "3px solid grey";
-        this.button.style.color = "darkgrey";
-    }
-    enableButton(){
-        this.isDisabled = false;
-        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-        this.button.style.border = "3px solid black";
-        this.button.style.color = "black";
     }
 }
 
@@ -344,12 +344,12 @@ class playButtonManager{
             if(i == this.playingButton){
                 continue;
             }
-            this.buttons[i].disableButton();
+            this.buttons[i].disable();
         }
     }
     enableButtons(){
         for(var i = 0; i< this.buttons.length;i++){
-            this.buttons[i].enableButton();
+            this.buttons[i].enable();
         }
     }
 }
@@ -565,7 +565,7 @@ class audio{
         //show matrix
         this.changeMatrixSpelling();
         this.showMatrix();
-        this.matrixManager.printButton.enableButton();
+        this.matrixManager.printButton.enable();
     }
     hideMatrix(){
         this.containerDiv.style.display = "none";
@@ -582,28 +582,9 @@ class audio{
     }
 }
 
-class printButton {
-    matrixManager;
-    button = document.getElementById("print-button")
-    canPrint = false
-    constructor(manager){
-        this.matrixManager = manager;
-        this.disableButton();
-    }
-    disableButton(){
-        this.button.style.backgroundColor = "lightgrey";
-        this.button.style.border = "3px solid grey";
-        this.button.style.color = "darkgrey";
-        this.canPrint = false;
-    }
-    enableButton(){
-        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-        this.button.style.border = "3px solid black";
-        this.button.style.color = "black";
-        this.canPrint = true;
-    }
+class printButton extends button {
     printDoc(){
-        if(this.canPrint){
+        if(!this.isDisabled){
             window.print();
         }
     }
