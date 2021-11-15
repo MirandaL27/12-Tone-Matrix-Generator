@@ -45,10 +45,12 @@ class matrixManager{
     }
     resetMatrix(){
         this.primeRow.resetPrimeRow();
+        this.matrix.stopPlayingRow()
         this.matrix.hideMatrix();
         this.printButton.disableButton()
     }
     changeMatrixValues(){
+        this.matrix.stopPlayingRow();
         this.primeRow.getPrimeRowPitches();
         this.matrix.populateMatrix();
     }
@@ -330,6 +332,13 @@ class playButtonManager{
         console.log(index);
         this.buttons[index].changeToPlayButton();
     }
+    stopOscillator(){
+        if(this.audioRef.osc){
+            this.audioRef.stopPitches();
+        }
+        
+        return;
+    }
     disableButtons(){
         for(var i = 0; i< this.buttons.length;i++){
             if(i == this.playingButton){
@@ -567,6 +576,9 @@ class audio{
     invokePlayButtonManager(index){
         console.log("call play button stuff here!");
         this.playButtons.playAButton(index)
+    }
+    stopPlayingRow(){
+        this.playButtons.stopOscillator();
     }
 }
 
