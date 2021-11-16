@@ -13,7 +13,6 @@ class matrixManager{
         this.pageContent.addEventListener("click", function() {manReference.onClick(event)});
     }
     onClick(event){
-        console.log(event.target.id);
         if(event.target.id == "gen"){  
             this.changeMatrixValues()
         }
@@ -34,7 +33,6 @@ class matrixManager{
         }
         else if (event.target.id.toString().includes("play")){
             var index = parseInt(event.target.id.replace("play",""));
-            console.log(index);
             this.matrix.invokePlayButtonManager(index);
         }
 
@@ -168,28 +166,17 @@ class pitchArrays {
         this.resetModeButtons();
         for(var i = 0; i < 12; i++){
             if(this.spellingMode == "sharp"){
-                //go into each row block and change the text
-                var note = document.getElementById(this.sharpArray[i]);
-                note.innerHTML = "<p>"+ this.sharpArray[i]+"</p>";
-                note.style.fontSize = "3vw";
-                note.style.fontWeight = "normal";
+                this.styleNotes(i,this.sharpArray,"3vw","normal");
             }
             else if(this.spellingMode == "flat"){
-                var note = document.getElementById(this.sharpArray[i]);
-                note.innerHTML = "<p>"+ this.flatArray[i]+"</p>";
-                note.style.fontSize = "3vw";
-                note.style.fontWeight = "normal";
+                this.styleNotes(i,this.flatArray,"3vw","normal");
             }
             else{
-                var note = document.getElementById(this.sharpArray[i]);
-                note.innerHTML = "<p>"+ this.bothArray[i]+"</p>";
-                note.style.fontSize = "1.5vw";
-                note.style.fontWeight = "Bold";
+                this.styleNotes(i,this.bothArray,"1.5vw","bold");
             }
         }
     }
     resetModeButtons(){
-        console.log(this.spellingMode);
         switch(this.spellingMode){
             case "sharp":
                 this.sharpButton.select();
@@ -207,6 +194,12 @@ class pitchArrays {
                 this.bothButton.select();
                 break;    
         }
+    }
+    styleNotes(index,array, fontSize, fontStyle){
+        var note = this.matrixManager.primeRow.pitchButtons[index];
+        note.innerHTML = "<p>"+ array[index]+"</p>";
+        note.style.fontSize = fontSize;
+        note.style.fontWeight = fontStyle;
     }
 
 }
@@ -234,23 +227,25 @@ class primeRow {
         if(this.isFirstClick){
             this.pitch = id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.pitch)];
-            primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
+            var index = this.matrixManager.getNumberFromPitch(this.pitch);
+            this.selectPitch(index);
             this.isFirstClick = false;
         }
         else{
             this.secondPitch = id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.secondPitch)];
-            primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
+            var index = this.matrixManager.getNumberFromPitch(this.secondPitch);
+            this.selectPitch(index);
             this.swapPitches();
             this.isFirstClick = true;
         }
     }
 
     swapPitches(){
-        this.pitch1 = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.pitch)];
-        this.pitch2 = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.secondPitch)];
+        var index1 =this.matrixManager.getNumberFromPitch(this.pitch);
+        var index2 = this.matrixManager.getNumberFromPitch(this.secondPitch);
+        this.pitch1 = this.pitchButtons[index1];
+        this.pitch2 = this.pitchButtons[index2];
 
         //change order of two pitches
         var temp = this.pitch1.style.order;
@@ -258,10 +253,8 @@ class primeRow {
         this.pitch2.style.order = temp;
     
         //change style back to default background
-        this.pitch1.style.backgroundImage = null;
-        this.pitch2.style.backgroundImage = null;
-        this.pitch1.style.backgroundColor = "mediumslateblue";
-        this.pitch2.style.backgroundColor = "mediumslateblue";
+        this.deselectPitch(index1);
+        this.deselectPitch(index2);
     }
     resetPrimeRow(){
         //loop through each element of sharpArray and use the values to reset the order of the prime row blocks.
@@ -273,6 +266,15 @@ class primeRow {
         for(var i = 0; i<this.pitchButtons.length; i++){
             this.primeRowPitches[this.pitchButtons[i].style.order] = this.pitchButtons[i].id;
         }
+    }
+    selectPitch(index){
+        var primeRowPitch = this.pitchButtons[index];
+            primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
+    }
+    deselectPitch(index){
+        var primeRowPitch = this.pitchButtons[index];
+        primeRowPitch.style.backgroundImage = null;
+        primeRowPitch.style.backgroundColor = "mediumslateblue";
     }
 }
 
@@ -299,7 +301,6 @@ class playButtonManager{
     audioRef;
     playingButton= 0;
     constructor(manager){
-        console.log(manager);
         this.matrixManager = manager;
         this.audioRef = new audio(this.matrixManager);
     }
@@ -327,7 +328,6 @@ class playButtonManager{
     stopAButton(index){
         this.audioRef.stopPitches(0);
         this.enableButtons();
-        console.log(index);
         this.buttons[index].changeToPlayButton();
     }
     stopOscillator(){
@@ -363,7 +363,6 @@ class audio{
     setup(){
         this.context = new AudioContext;
         this.osc = this.context.createOscillator();
-        console.log(this.matrixManager);
         var audioRef = this.matrixManager.matrix.playButtons;
         this.osc.onended = function() {audioRef.stopAButton(audioRef.playingButton)};
         this.osc.type = "sine";
@@ -430,14 +429,7 @@ class audio{
             //make 14 table rows
             this.rows.push(document.createElement("tr"));
             if(i > 0 && i < 13){
-                this.buttonCells.push(document.createElement("td"));
-                var playB = new playButton();
-                playB.button = document.createElement("button");
-                this.playButtons.addplayButton(playB);
-                this.styleButton(i-1);
-
-                this.buttonCells[i-1].appendChild(this.playButtons.getPlayButton(i-1).button);
-                this.rows[i].appendChild(this.buttonCells[i-1]);
+                this.createPlayButton(i-1, i);
             }
             else{
                 var buffer = document.createElement("td");
@@ -446,23 +438,36 @@ class audio{
             
             for(var j = 0; j < 14; j++){
                 var index = (i*14) + j;
-                    this.cells.push(document.createElement("td"));
-                    this.styleCell(index);
-
-                    this.cellDivs.push(document.createElement("div"));
-                    this.styleCellDiv(index)
-
-                    this.ps.push(document.createElement("p"));
-                    this.styleP(index);
-
-                    this.cellDivs[index].appendChild(this.ps[index]);
-                    this.cells[index].appendChild(this.cellDivs[index]);
-                    this.rows[i].appendChild(this.cells[index]);
-                
+                    this.createDefaultCells(index, i);             
             }
             this.table.appendChild(this.rows[i]);
         }
         this.containerDiv.appendChild(this.table);
+    }
+    createPlayButton(index, row){
+        this.buttonCells.push(document.createElement("td"));
+        var playB = new playButton();
+        playB.button = document.createElement("button");
+        this.playButtons.addplayButton(playB);
+        this.styleButton(index);
+
+        this.buttonCells[index].appendChild(this.playButtons.getPlayButton(index).button);
+        this.rows[row].appendChild(this.buttonCells[index]);
+        return;
+    }
+    createDefaultCells(index, row){
+        this.cells.push(document.createElement("td"));
+        this.styleCell(index);
+
+        this.cellDivs.push(document.createElement("div"));
+        this.styleCellDiv(index)
+
+        this.ps.push(document.createElement("p"));
+        this.styleP(index);
+
+        this.cellDivs[index].appendChild(this.ps[index]);
+        this.cells[index].appendChild(this.cellDivs[index]);
+        this.rows[row].appendChild(this.cells[index]);
     }
     styleContainerDiv(){
         this.containerDiv.style = "justify-content: center; margin:20px; display:none;"//hide the matrix
@@ -522,7 +527,6 @@ class audio{
 
     populateMatrix(){
         //compute matrix values and show matrix
-
         for(var i = 0; i < 196; i++){
             var row = Math.floor(i/14);
             var p = this.ps[i];
@@ -548,23 +552,12 @@ class audio{
             }
             else if(i%14 == 0){
                 //P row - numbers inverted from prime row
-                var val1 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[row-1]);
-                var val2 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
-                var pValue = val2-val1; 
-                if(pValue < 0){
-                    pValue += 12;
-                }
+                var pValue = this.calculateInversion(row-1);
                 p.textContent = "P" + pValue;
             }
             else if (i> 1 && i < 13){
                 //I row - numbers from prime row
-                //var pValue = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
-                var val1 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
-                var val2 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
-                var pValue = val1-val2; 
-                if(pValue < 0){
-                    pValue += 12;
-                }
+                var pValue = this.calculateInversion(i-1);
                 p.textContent = "I" + pValue;
             }
             else if (i > 183 && i < 195){
@@ -578,16 +571,11 @@ class audio{
                 p.textContent = pValue;
             }
             else if (i%14 == 1){
-                //First column of pitches - numbers based on column 0.
-                var offset = parseInt(this.ps[i-1].textContent.replace("P",""));
-                var newPitchNum = (this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0])+ offset)%12;
-                p.textContent = this.matrixManager.pitchArrays.sharpArray[newPitchNum];
+                //First column of pitches
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[this.calculateTransposition(i-1, 0)];
             }
             else{
-                var offset = parseInt(this.ps[i - i%14].textContent.replace("P",""));
-                var basePitchNum = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i - (row-1)*14) - 15]);
-                var newPitchNum = (basePitchNum + offset)%12;
-                p.textContent = this.matrixManager.pitchArrays.sharpArray[newPitchNum];
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[this.calculateTransposition(i - i%14,(i - (row-1)*14) - 15)];
             }
         }
 
@@ -596,6 +584,21 @@ class audio{
         this.showMatrix();
         this.matrixManager.printButton.enable();
     }
+    calculateInversion(index){
+        var val1 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[index]);
+        var val2 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
+        var final = val2-val1; 
+        if(final < 0){
+            final += 12;
+        }
+        return final;
+    }
+    calculateTransposition(offsetIndex,primeRowIndex){
+        var offset = parseInt(this.ps[offsetIndex].textContent.replace("P",""));
+        var basePitchNum = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[primeRowIndex]);
+        var newPitchNum = (basePitchNum + offset)%12;
+        return newPitchNum;
+    }
     hideMatrix(){
         this.containerDiv.style.display = "none";
     }
@@ -603,7 +606,6 @@ class audio{
         this.containerDiv.style.display = "flex";
     }
     invokePlayButtonManager(index){
-        console.log("call play button stuff here!");
         this.playButtons.playAButton(index)
     }
     stopPlayingRow(){
@@ -619,15 +621,7 @@ class printButton extends button {
     }
 }
 
-
-
 var manager = new matrixManager();
 
 manager.setOnClickForButtons();
 manager.generateMatrix();
-
-//var pageContentEl = document.querySelector("#page-content");
-// pageContentEl.addEventListener("click", taskButtonHandler);
-// pageContentEl.addEventListener("change", taskStatusChangeHandler);
-
-
