@@ -13,6 +13,7 @@ class matrixManager{
         this.pageContent.addEventListener("click", function() {manReference.onClick(event)});
     }
     onClick(event){
+        //differentiate between buttons using their id's and class names
         if(event.target.id == "gen"){  
             this.changeMatrixValues()
         }
@@ -424,7 +425,6 @@ class audio{
         this.section.appendChild(this.containerDiv);
          //make the table
         this.styleTable();
-        var indexOffset = 0;
         for(var i = 0; i < 14; i++){
             //make 14 table rows
             this.rows.push(document.createElement("tr"));
