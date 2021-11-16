@@ -1,34 +1,62 @@
 class matrixManager{
     //class that will handle all of the fucntion calls 
-    printButton = new printButton(this);
-    resetButton = new resetButton(this);
-    generateButton = new generateButton(this);
+    printButton = new printButton(true,"print-button");
+    resetButton = new button(false, "reset-button");
+    generateButton = new button(false, "gen");
     pitchArrays = new pitchArrays(this);
-    primeRow = new primeRow(this, this.pitchArrays);
-    matrix = new matrix(this, this.pitchArrays);
+    primeRow = new primeRow(this);
+    matrix = new matrix(this);
+    pageContent = document.querySelector("body");
+
     setOnClickForButtons(){
-        this.printButton.setOnClick();
-        this.printButton.disableButton();
-        this.resetButton.setOnClick();
-        this.generateButton.setOnClick();
-        this.pitchArrays.setOnClick();
-        this.primeRow.setOnClick();
+        var manReference = this;
+        this.pageContent.addEventListener("click", function() {manReference.onClick(event)});
+    }
+    onClick(event){
+        console.log(event.target.id);
+        if(event.target.id == "gen"){  
+            this.changeMatrixValues()
+        }
+        else if (event.target.id == "reset-button"){
+            this.resetMatrix()
+        }
+        else if (event.target.id == "print-button"){
+            this.printButton.printDoc();
+        }
+        else if(event.target.id == "sharp" || event.target.id == "flat" || event.target.id == "both"){
+                this.changeMatrixSpellingMode(event.target.id);
+        }
+        else if(event.target.className == "pitches" ){
+                this.primeRow.getId(event.target.id);
+        }
+        else if (event.target.className == "pitchesP"){
+            this.primeRow.getId(event.path[1].id);
+        }
+        else if (event.target.id.toString().includes("play")){
+            var index = parseInt(event.target.id.replace("play",""));
+            console.log(index);
+            this.matrix.invokePlayButtonManager(index);
+        }
+
+        return;
     }
     generateMatrix(){
         this.matrix.generateMatrix();
     }
-    resetMatrix(event,manager){
-        manager.primeRow.resetPrimeRow();
-        manager.matrix.hideMatrix();
-        manager.printButton.disableButton()
+    resetMatrix(){
+        this.primeRow.resetPrimeRow();
+        this.matrix.stopPlayingRow()
+        this.matrix.hideMatrix();
+        this.printButton.disable()
     }
-    changeMatrixValues(event,manager){
-        manager.primeRow.getPrimeRowPitches();
-        manager.matrix.populateMatrix();
+    changeMatrixValues(){
+        this.matrix.stopPlayingRow();
+        this.primeRow.getPrimeRowPitches();
+        this.matrix.populateMatrix();
     }
-    changeMatrixSpellingMode(event,manager){
-        manager.pitchArrays.respellAccidentals(event.id);
-        manager.matrix.changeMatrixSpelling()
+    changeMatrixSpellingMode(mode){
+        this.pitchArrays.respellAccidentals(mode);
+        this.matrix.changeMatrixSpelling()
     }
     getNumberFromPitch(p){
         //switch statement correlating the pitches with integers
@@ -83,6 +111,40 @@ class matrixManager{
 
 }
 
+//button base class that all buttons inherit from.
+class button{
+    button;
+    isDisabled;
+    matrixManager;
+    constructor(isDisabledInitially = false, id = null){
+        this.isDisabled = isDisabledInitially;
+        this.button = document.getElementById(id);
+        if(this.isDisabled){
+            this.disable();
+        }
+        return;
+    }
+    select(){
+        this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+    }
+    deselect(){
+        this.button.style.backgroundImage = null;
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+    }
+    disable(){
+        this.isDisabled = true;
+        this.button.style.backgroundColor = "lightgrey";
+        this.button.style.border = "3px solid grey";
+        this.button.style.color = "darkgrey";
+    }
+    enable(){
+        this.isDisabled = false;
+        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.button.style.border = "3px solid black";
+        this.button.style.color = "black";
+    }
+}
+
 class pitchArrays {
     matrixManager;
     sharpArray=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
@@ -90,24 +152,16 @@ class pitchArrays {
     bothArray=["C","C#/D&#9837", "D","D#/E&#9837", "E", "F","F#/G&#9837", "G", "G#/A&#9837", "A","A#/B&#9837", "B"];
     pitchFrequencies = [261.6, 277.2, 293.7, 311.1, 329.6,349.2, 370, 392, 415.3, 440, 466.2, 493.9];
     spellingMode = "sharp";
-    sharpButton = document.getElementById("sharp");
-    flatButton = document.getElementById("flat");
-    bothButton = document.getElementById("both");
+    sharpButton = new button( false, "sharp");
+    flatButton = new button( false, "flat");
+    bothButton = new button( false, "both");
     constructor(manager){
         this.matrixManager = manager;
+        this.sharpButton.select();
     }
 
     setSpellingMode(mode){
         this.spellingMode = mode;
-    }
-    setOnClick(){
-        var manReference = this.matrixManager;
-        this.sharpButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
-        this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-
-        this.flatButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
-
-        this.bothButton.addEventListener("click",function() {manReference.changeMatrixSpellingMode(this, manReference)});
     }
     respellAccidentals(spelling){
         this.spellingMode = spelling;
@@ -135,57 +189,27 @@ class pitchArrays {
         }
     }
     resetModeButtons(){
+        console.log(this.spellingMode);
         switch(this.spellingMode){
             case "sharp":
-                this.sharpButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-                this.flatButton.style.backgroundImage = null;
-                this.flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-                this.bothButton.style.backgroundImage = null;
-                this.bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.select();
+                this.flatButton.deselect();
+                this.bothButton.deselect();
                 break;
             case "flat":
-                this.flatButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-                this.sharpButton.style.backgroundImage = null;
-                this.sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-                this.bothButton.style.backgroundImage = null;
-                this.bothButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.deselect();
+                this.flatButton.select();
+                this.bothButton.deselect();
                 break;
             default:
-                this.bothButton.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
-                this.flatButton.style.backgroundImage = null;
-                this.flatButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-                this.sharpButton.style.backgroundImage = null;
-                this.sharpButton.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+                this.sharpButton.deselect();
+                this.flatButton.deselect();
+                this.bothButton.select();
                 break;    
         }
     }
 
 }
-
-class resetButton{
-    matrixManager;
-    button = document.getElementById("reset-button");
-    constructor(manager){
-        this.matrixManager = manager;
-    }
-    setOnClick(){
-        var manReference = this.matrixManager;
-        this.button.addEventListener("click",function() {manReference.resetMatrix(this, manReference)});
-    }
-}
-
-class generateButton{
-    matrixManager;
-    button = document.getElementById("gen");
-    constructor(manager){
-        this.matrixManager = manager;
-    }
-    setOnClick(){
-        var manReference = this.matrixManager;
-        this.button.addEventListener("click",function() {manReference.changeMatrixValues(this, manReference)});
-    }
-}
-
 
 class primeRow {
     matrixManager;
@@ -195,36 +219,32 @@ class primeRow {
     isFirstClick = true;
     primeRowPitches = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
     pitchButtons = [];
-    constructor(manager, pitchmode){
+    constructor(manager){
         this.matrixManager = manager;
-        this.pitchArrays = pitchmode
-    }
-    setOnClick(){
+        this.pitchArrays = this.matrixManager.pitchArrays;
         for(var i = 0; i<this.primeRowPitches.length;i++){
             var pitch = document.getElementById(this.primeRowPitches[i]);
             pitch.style.order = i;
-            var prReference = this;
-            pitch.addEventListener("click",function() {prReference.getId(this, prReference)});
             this.pitchButtons.push(pitch);
         }
-        return;
+        return; 
     }
 
-    getId(event, primeRow){
-        if(primeRow.isFirstClick){
-            primeRow.pitch = event.id;
+    getId(id){
+        if(this.isFirstClick){
+            this.pitch = id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = primeRow.pitchButtons[this.matrixManager.getNumberFromPitch(primeRow.pitch)];
+            var primeRowPitch = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.pitch)];
             primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
-            primeRow.isFirstClick = false;
+            this.isFirstClick = false;
         }
         else{
-            primeRow.secondPitch = event.id;
+            this.secondPitch = id;
             //change style of clicked element to be hover background.
-            var primeRowPitch = primeRow.pitchButtons[this.matrixManager.getNumberFromPitch(primeRow.secondPitch)];
+            var primeRowPitch = this.pitchButtons[this.matrixManager.getNumberFromPitch(this.secondPitch)];
             primeRowPitch.style.backgroundImage = "radial-gradient(mediumslateblue,rgb(91, 27, 150))";
-            primeRow.swapPitches();
-            primeRow.isFirstClick = true;
+            this.swapPitches();
+            this.isFirstClick = true;
         }
     }
 
@@ -258,88 +278,76 @@ class primeRow {
 
 
 
-class playButton {
+class playButton extends button {
     button;
     isStop = false;
-    isDisabled = false;
     changeToStopButton(){
         this.button.textContent = "Stop";
-        this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+        this.select();
         this.isStop = true;
     }
-    changeToPlayButtonNoRefs(){
+    changeToPlayButton(){
         this.button.textContent = "Play";
-        this.button.style.backgroundImage = null;
-        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.deselect();
         this.isStop = false;
-    }
-    changeToPlayButton(event, buttonRef){
-        buttonRef.button.textContent = "Play";
-        buttonRef.button.style.backgroundImage = null;
-        buttonRef.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-        buttonRef.isStop = false;
-    }
-    disableButton(){
-        this.isDisabled = true;
-        this.button.style.backgroundColor = "lightgrey";
-        this.button.style.border = "3px solid grey";
-        this.button.style.color = "darkgrey";
-    }
-    enableButton(){
-        this.isDisabled = false;
-        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-        this.button.style.border = "3px solid black";
-        this.button.style.color = "black";
     }
 }
 
 class playButtonManager{
+    matrixManager;
     buttons = [];
+    audioRef;
     playingButton= 0;
+    constructor(manager){
+        console.log(manager);
+        this.matrixManager = manager;
+        this.audioRef = new audio(this.matrixManager);
+    }
     addplayButton(button){
         this.buttons.push(button);
     }
     getPlayButton(index){
         return this.buttons[index];
     }
-    addEventListenersToButtons(audioReference){
-        var buttonRef = this;
-        for(var i = 0; i < this.buttons.length; i++){
-        var audRef = audioReference[i];
-        this.buttons[i].button.addEventListener("click", function() { buttonRef.playAButton(this, audRef, buttonRef)});
-        }
-    }
-    playAButton(event, audioReference, buttons){
-        var row = event.id;
-        row = row.replace("play","");
-        if(buttons.buttons[row].isDisabled){
+    playAButton(index){
+        if(this.buttons[index].isDisabled){
             return;
         }
         
-        buttons.playingButton = row
-        buttons.disableButtons();
-        if(buttons.buttons[row].isStop){
-            buttons.enableButtons();
+        this.playingButton = index
+        this.disableButtons();
+        if(this.buttons[index].isStop){
+            this.stopAButton(index);
+            this.enableButtons();
         }
-        audioReference.playPitches(row,buttons);
+        this.buttons[index].changeToStopButton();
+        this.audioRef.playPitches(index);
         
     }
-    stopAButton(event, audioRef,buttons){
-        audioRef.playPitches(event, buttons);
-        buttons.enableButtons();
-        buttons.buttons[event].changeToPlayButtonNoRefs();
+    stopAButton(index){
+        this.audioRef.stopPitches(0);
+        this.enableButtons();
+        console.log(index);
+        this.buttons[index].changeToPlayButton();
+    }
+    stopOscillator(){
+        if(this.audioRef.osc){
+            this.audioRef.stopPitches();
+        }
+        
+        return;
     }
     disableButtons(){
         for(var i = 0; i< this.buttons.length;i++){
             if(i == this.playingButton){
                 continue;
             }
-            this.buttons[i].disableButton();
+            this.buttons[i].disable();
         }
     }
     enableButtons(){
         for(var i = 0; i< this.buttons.length;i++){
-            this.buttons[i].enableButton();
+            this.buttons[i].enable();
         }
     }
 }
@@ -352,45 +360,44 @@ class audio{
     constructor(manager){
         this.matrixManager = manager;
     }
+    setup(){
+        this.context = new AudioContext;
+        this.osc = this.context.createOscillator();
+        console.log(this.matrixManager);
+        var audioRef = this.matrixManager.matrix.playButtons;
+        this.osc.onended = function() {audioRef.stopAButton(audioRef.playingButton)};
+        this.osc.type = "sine";
+        this.osc.connect(this.context.destination);
+       return;
+    }
     populatePitches(row){
-        for(var i  = row*12; i<(row*12 + 12);i++){
+        var start =(row + 1)*14 +1;
+        for(var i = start ; i<(start + 12) ;i++){
             var p = document.getElementById(i.toString());
             var num = this.matrixManager.getNumberFromPitch(p.textContent);
             var freq = manager.pitchArrays.pitchFrequencies[num];
             this.pitchArray.push(freq);   
         }
+        return;
     }
-    playPitches(row, buttons){
-        if(buttons.buttons[row].isDisabled){
-            return;
-        }
-        if(buttons.buttons[row].isStop){
-            this.stopPitches(0,buttons, row);
-            this.pitchArray.length = 0;
-            return;
-        }
-        this.context = new AudioContext;
-
-        buttons.buttons[row].changeToStopButton();
-
-        this.osc = this.context.createOscillator();
-        var audioRef = this;
-        this.osc.onended = function() {buttons.stopAButton(row,audioRef,buttons)};
-        this.osc.type = "sine";
-
+    playPitches(row){
+        this.setup();
         this.populatePitches(row);
-        this.osc.connect(this.context.destination);
+
         for(var i = 0; i < this.pitchArray.length; i++){
             this.osc.frequency.setValueAtTime(this.pitchArray[i], this.context.currentTime + i);
             if (i == 0){
                 this.osc.start(); 
             }
         }
-        this.stopPitches(12,buttons, row)
+        this.stopPitches(12)
         return;
     }
-    stopPitches(stopTime, buttons, index){
+
+    stopPitches(stopTime){
         this.osc.stop(stopTime);
+        this.pitchArray.length = 0;
+        return;
     }
 }
 
@@ -402,14 +409,14 @@ class audio{
     table = document.createElement("table")
     rows = []
     cellDivs = []
-    playButtons = new playButtonManager();
+    playButtons;
     buttonCells = []
     cells = []
     ps = []
-    audioArray = []
-    constructor(manager, pitchMode){
+    constructor(manager){
         this.matrixManager = manager;
-        this.pitchArrays = pitchMode;
+        this.pitchArrays = this.matrixManager.pitchArrays;
+        this.playButtons = new playButtonManager(this.matrixManager);
     }
     generateMatrix(){
         //generates and hides the HTML elements for the matrix
@@ -418,38 +425,40 @@ class audio{
         this.section.appendChild(this.containerDiv);
          //make the table
         this.styleTable();
-        for(var i = 0; i < 12; i++){
-            //make 12 table rows
+        var indexOffset = 0;
+        for(var i = 0; i < 14; i++){
+            //make 14 table rows
             this.rows.push(document.createElement("tr"));
+            if(i > 0 && i < 13){
+                this.buttonCells.push(document.createElement("td"));
+                var playB = new playButton();
+                playB.button = document.createElement("button");
+                this.playButtons.addplayButton(playB);
+                this.styleButton(i-1);
 
-            var aud = new audio(this.matrixManager);
-            this.audioArray.push(aud);
+                this.buttonCells[i-1].appendChild(this.playButtons.getPlayButton(i-1).button);
+                this.rows[i].appendChild(this.buttonCells[i-1]);
+            }
+            else{
+                var buffer = document.createElement("td");
+                this.rows[i].appendChild(buffer);
+            }
+            
+            for(var j = 0; j < 14; j++){
+                var index = (i*14) + j;
+                    this.cells.push(document.createElement("td"));
+                    this.styleCell(index);
 
-            this.buttonCells.push(document.createElement("td"));
-            var playB = new playButton();
-            playB.button = document.createElement("button");
-            this.playButtons.addplayButton(playB);
-            this.styleButton(i);
+                    this.cellDivs.push(document.createElement("div"));
+                    this.styleCellDiv(index)
 
-            this.buttonCells[i].appendChild(this.playButtons.getPlayButton(i).button);
-            this.rows[i].appendChild(this.buttonCells[i]);
+                    this.ps.push(document.createElement("p"));
+                    this.styleP(index);
 
-            for(var j = 0; j < 12; j++){
-                var index = (i*12) + j;
-                //make 12 table cells inside each row
-                //each one should contain a div flexbox with a paragraph element in it.
-                this.cells.push(document.createElement("td"));
-                this.styleCell(index);
-
-                this.cellDivs.push(document.createElement("div"));
-                this.styleCellDiv(index)
-
-                this.ps.push(document.createElement("p"));
-                this.styleP(index);
-
-                this.cellDivs[index].appendChild(this.ps[index]);
-                this.cells[index].appendChild(this.cellDivs[index]);
-                this.rows[i].appendChild(this.cells[index]);
+                    this.cellDivs[index].appendChild(this.ps[index]);
+                    this.cells[index].appendChild(this.cellDivs[index]);
+                    this.rows[i].appendChild(this.cells[index]);
+                
             }
             this.table.appendChild(this.rows[i]);
         }
@@ -481,32 +490,30 @@ class audio{
         this.cells[index].className = "matrix-cell";
     }
     styleP(index){
-        this.ps[index].id = (index).toString();
-        this.ps[index].textContent = "0";
+        this.ps[index].id = index;
+        this.ps[index].setAttribute("textContent","0");
         this.ps[index].style =  "font-size:23px;";
     }
 
     changeMatrixSpelling(){
         //change to sharps, flats or both depending on spellingMode
         for(var i=0;i<144;i++){
-            var p = this.ps[i];
+            var row = Math.floor(i/12);
+            var p = this.ps[i+15+row*2];
 
             var str = p.textContent;
             if(this.matrixManager.pitchArrays.spellingMode == "sharp"){
                 p.textContent = this.matrixManager.pitchArrays.sharpArray[this.matrixManager.getNumberFromPitch(str)];
-                // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else if (this.matrixManager.pitchArrays.spellingMode == "flat"){
                 p.innerHTML = this.matrixManager.pitchArrays.flatArray[this.matrixManager.getNumberFromPitch(str)];
-                // p.style.fontSize = "23px";
                 p.style.fontSize = "2.5vw";
                 p.style.fontWeight = "normal";
             }
             else{
                 p.innerHTML = this.matrixManager.pitchArrays.bothArray[this.matrixManager.getNumberFromPitch(str)];
-                //p.style.fontSize = "10px";
                 p.style.fontSize = "1.5vw";
                 p.style.fontWeight = "bold";
             }      
@@ -515,53 +522,79 @@ class audio{
 
     populateMatrix(){
         //compute matrix values and show matrix
-    
-        //put prime row in first
-        for(var i =0;i <12; i++){
 
-                this.ps[i].textContent = this.matrixManager.primeRow.primeRowPitches[i];
-        }
-        //then update the first column
-        for(var i=0; i<144;i+=12){
-            //inversion: 
-            if(i != 0){
-                var first = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i-12)/12]);
-                var second = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[((i-12)/12) + 1]);
-                var diff = second - first;
-                var p = this.ps[i];
-                var prevP = this.ps[i-12];
-                var invertedDiff = this.matrixManager.getNumberFromPitch(prevP.textContent) - diff;
-                if(invertedDiff < 0){
-                    invertedDiff+=12;
-                }
-                else if (invertedDiff>=12){
-                    invertedDiff-=12;
-                }
-                p.textContent = this.pitchArrays.sharpArray[invertedDiff];      
-            }
-        }
-        var offset=0;
-        //populate the rest of the table
-        for(var i = 12; i < 144; i++){
+        for(var i = 0; i < 196; i++){
+            var row = Math.floor(i/14);
             var p = this.ps[i];
-            if(i%12 == 0){
-                //it's the first cell in the row, set offset for transposition
-                offset = this.matrixManager.getNumberFromPitch(p.textContent) - this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
-                if(offset < 0){
-                    offset += 12;
+            if(i==0 || i == 13 || i == 182 || i == 195){
+                //these cells are blank
+                p.textContent = "";
+            }
+            else if(i==1){
+                p.textContent = "I0";
+            }
+            else if(i == 14){
+                p.textContent = "P0";
+            }
+            else if(i == 27){
+                p.textContent = "R0";
+            }
+            else if(i == 183){
+                p.textContent = "RI0";
+            }
+            else if(i > 14 && i<27){
+                //this is the prime row 15-26
+                this.ps[i].textContent = this.matrixManager.primeRow.primeRowPitches[i-15];
+            }
+            else if(i%14 == 0){
+                //P row - numbers inverted from prime row
+                var val1 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[row-1]);
+                var val2 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
+                var pValue = val2-val1; 
+                if(pValue < 0){
+                    pValue += 12;
                 }
+                p.textContent = "P" + pValue;
+            }
+            else if (i> 1 && i < 13){
+                //I row - numbers from prime row
+                //var pValue = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
+                var val1 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
+                var val2 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
+                var pValue = val1-val2; 
+                if(pValue < 0){
+                    pValue += 12;
+                }
+                p.textContent = "I" + pValue;
+            }
+            else if (i > 183 && i < 195){
+                //RI Row - numbers same as I row
+                var pValue = this.ps[i%14].textContent.replace("I","RI");
+                p.textContent = pValue;
+            }
+            else if(i%14 == 13){
+                //R row - numbers same as P row
+                var pValue = this.ps[i-13].textContent.replace("P","R");
+                p.textContent = pValue;
+            }
+            else if (i%14 == 1){
+                //First column of pitches - numbers based on column 0.
+                var offset = parseInt(this.ps[i-1].textContent.replace("P",""));
+                var newPitchNum = (this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0])+ offset)%12;
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[newPitchNum];
             }
             else{
-                //it's not the first cell in the row, transpose based on offset
-                var newPitch = (this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i%12]) + offset)%12;
-                p.textContent = this.pitchArrays.sharpArray[newPitch];
+                var offset = parseInt(this.ps[i - i%14].textContent.replace("P",""));
+                var basePitchNum = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i - (row-1)*14) - 15]);
+                var newPitchNum = (basePitchNum + offset)%12;
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[newPitchNum];
             }
         }
+
         //show matrix
         this.changeMatrixSpelling();
-        this.setOnClick();
         this.showMatrix();
-        this.matrixManager.printButton.enableButton();
+        this.matrixManager.printButton.enable();
     }
     hideMatrix(){
         this.containerDiv.style.display = "none";
@@ -569,36 +602,18 @@ class audio{
     showMatrix(){
         this.containerDiv.style.display = "flex";
     }
-    setOnClick(){
-        this.playButtons.addEventListenersToButtons(this.audioArray)
+    invokePlayButtonManager(index){
+        console.log("call play button stuff here!");
+        this.playButtons.playAButton(index)
+    }
+    stopPlayingRow(){
+        this.playButtons.stopOscillator();
     }
 }
 
-class printButton {
-    matrixManager;
-    button = document.getElementById("print-button")
-    canPrint = false
-    constructor(manager){
-        this.matrixManager = manager;
-    }
-    setOnClick(){
-        var printReference = this
-        this.button.addEventListener("click",function() {printReference.printDoc(this, printReference)});
-    }
-    disableButton(){
-        this.button.style.backgroundColor = "lightgrey";
-        this.button.style.border = "3px solid grey";
-        this.button.style.color = "darkgrey";
-        this.canPrint = false;
-    }
-    enableButton(){
-        this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
-        this.button.style.border = "3px solid black";
-        this.button.style.color = "black";
-        this.canPrint = true;
-    }
-    printDoc(event,printRef){
-        if(printRef.canPrint){
+class printButton extends button {
+    printDoc(){
+        if(!this.isDisabled){
             window.print();
         }
     }
@@ -611,6 +626,8 @@ var manager = new matrixManager();
 manager.setOnClickForButtons();
 manager.generateMatrix();
 
-
+//var pageContentEl = document.querySelector("#page-content");
+// pageContentEl.addEventListener("click", taskButtonHandler);
+// pageContentEl.addEventListener("change", taskStatusChangeHandler);
 
 
