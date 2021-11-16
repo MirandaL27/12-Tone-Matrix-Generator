@@ -424,38 +424,51 @@ class audio{
         this.section.appendChild(this.containerDiv);
          //make the table
         this.styleTable();
-        for(var i = 0; i < 12; i++){
-            //make 12 table rows
+        var indexOffset = 0;
+        for(var i = 0; i < 14; i++){
+            //make 14 table rows
             this.rows.push(document.createElement("tr"));
+            if(i > 0 && i < 13){
+                this.buttonCells.push(document.createElement("td"));
+                var playB = new playButton();
+                playB.button = document.createElement("button");
+                this.playButtons.addplayButton(playB);
+                this.styleButton(i-1);
 
-            // var aud = new audio(this.matrixManager);
-            // this.playButtons.addAudio(aud);
-
-            this.buttonCells.push(document.createElement("td"));
-            var playB = new playButton();
-            playB.button = document.createElement("button");
-            this.playButtons.addplayButton(playB);
-            this.styleButton(i);
-
-            this.buttonCells[i].appendChild(this.playButtons.getPlayButton(i).button);
-            this.rows[i].appendChild(this.buttonCells[i]);
-
-            for(var j = 0; j < 12; j++){
-                var index = (i*12) + j;
-                //make 12 table cells inside each row
+                this.buttonCells[i-1].appendChild(this.playButtons.getPlayButton(i-1).button);
+                this.rows[i].appendChild(this.buttonCells[i-1]);
+            }
+            else{
+                var buffer = document.createElement("td");
+                this.rows[i].appendChild(buffer);
+            }
+            
+            for(var j = 0; j < 14; j++){
+                var index = (i*14) + j;
+                //make 14 table cells inside each row
                 //each one should contain a div flexbox with a paragraph element in it.
-                this.cells.push(document.createElement("td"));
-                this.styleCell(index);
+                if(index == 13 || index == 195){
+                    var buffer = document.createElement("td");
+                    this.rows[i].appendChild(buffer);
+                    indexOffset += 1;
+                    console.log(indexOffset)
+                }
+                else{
+                    console.log(index, this.cells.length,index-indexOffset, indexOffset);
+                    this.cells.push(document.createElement("td"));
+                    this.styleCell(index-indexOffset);
 
-                this.cellDivs.push(document.createElement("div"));
-                this.styleCellDiv(index)
+                    this.cellDivs.push(document.createElement("div"));
+                    this.styleCellDiv(index-indexOffset)
 
-                this.ps.push(document.createElement("p"));
-                this.styleP(index);
+                    this.ps.push(document.createElement("p"));
+                    this.styleP(index-indexOffset);
 
-                this.cellDivs[index].appendChild(this.ps[index]);
-                this.cells[index].appendChild(this.cellDivs[index]);
-                this.rows[i].appendChild(this.cells[index]);
+                    this.cellDivs[index-indexOffset].appendChild(this.ps[index-indexOffset]);
+                    this.cells[index-indexOffset].appendChild(this.cellDivs[index-indexOffset]);
+                    this.rows[i].appendChild(this.cells[index-indexOffset]);
+                }
+                
             }
             this.table.appendChild(this.rows[i]);
         }
