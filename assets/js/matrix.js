@@ -445,16 +445,6 @@ class audio{
             
             for(var j = 0; j < 14; j++){
                 var index = (i*14) + j;
-                //make 14 table cells inside each row
-                //each one should contain a div flexbox with a paragraph element in it.
-                // if(index == 13 || index == 195){
-                //     var buffer = document.createElement("td");
-                //     //this.cells.push(document.createElement("td"));
-                //     //this.styleCell(index);
-                //     this.rows[i].appendChild(buffer);
-                //     indexOffset += 1;
-                // }
-                //else{
                     this.cells.push(document.createElement("td"));
                     this.styleCell(index);
 
@@ -467,7 +457,6 @@ class audio{
                     this.cellDivs[index].appendChild(this.ps[index]);
                     this.cells[index].appendChild(this.cellDivs[index]);
                     this.rows[i].appendChild(this.cells[index]);
-                //}
                 
             }
             this.table.appendChild(this.rows[i]);
@@ -501,7 +490,6 @@ class audio{
     }
     styleP(index){
         this.ps[index].id = index;
-        //this.ps[index].textContent = index;
         this.ps[index].setAttribute("textContent","0");
         this.ps[index].style =  "font-size:23px;";
     }
@@ -509,7 +497,8 @@ class audio{
     changeMatrixSpelling(){
         //change to sharps, flats or both depending on spellingMode
         for(var i=0;i<144;i++){
-            var p = this.ps[i];
+            var row = Math.floor(i/12);
+            var p = this.ps[i+15+row*2];
 
             var str = p.textContent;
             if(this.matrixManager.pitchArrays.spellingMode == "sharp"){
@@ -602,7 +591,7 @@ class audio{
         }
 
         //show matrix
-        //this.changeMatrixSpelling();
+        this.changeMatrixSpelling();
         this.showMatrix();
         this.matrixManager.printButton.enable();
     }
