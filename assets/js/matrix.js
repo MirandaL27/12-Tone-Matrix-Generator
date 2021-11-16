@@ -371,7 +371,8 @@ class audio{
        return;
     }
     populatePitches(row){
-        for(var i  = row*12; i<(row*12 + 12);i++){
+        var start =(row + 1)*14 +1;
+        for(var i = start ; i<(start + 12) ;i++){
             var p = document.getElementById(i.toString());
             var num = this.matrixManager.getNumberFromPitch(p.textContent);
             var freq = manager.pitchArrays.pitchFrequencies[num];
