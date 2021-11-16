@@ -501,8 +501,8 @@ class audio{
     }
     styleP(index){
         this.ps[index].id = index;
-        this.ps[index].textContent = index;
-        //this.ps[index].setAttribute("textContent","0");
+        //this.ps[index].textContent = index;
+        this.ps[index].setAttribute("textContent","0");
         this.ps[index].style =  "font-size:23px;";
     }
 
@@ -532,48 +532,6 @@ class audio{
 
     populateMatrix(){
         //compute matrix values and show matrix
-    
-        //put prime row in first
-        // for(var i =0;i <12; i++){
-
-        //         this.ps[i].textContent = this.matrixManager.primeRow.primeRowPitches[i];
-        // }
-        // //then update the first column
-        // for(var i=0; i<144;i+=12){
-        //     //inversion: 
-        //     if(i != 0){
-        //         var first = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i-12)/12]);
-        //         var second = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[((i-12)/12) + 1]);
-        //         var diff = second - first;
-        //         var p = this.ps[i];
-        //         var prevP = this.ps[i-12];
-        //         var invertedDiff = this.matrixManager.getNumberFromPitch(prevP.textContent) - diff;
-        //         if(invertedDiff < 0){
-        //             invertedDiff+=12;
-        //         }
-        //         else if (invertedDiff>=12){
-        //             invertedDiff-=12;
-        //         }
-        //         p.textContent = this.pitchArrays.sharpArray[invertedDiff];      
-        //     }
-        // }
-        // var offset=0;
-        // //populate the rest of the table
-        // for(var i = 12; i < 144; i++){
-        //     var p = this.ps[i];
-        //     if(i%12 == 0){
-        //         //it's the first cell in the row, set offset for transposition
-        //         offset = this.matrixManager.getNumberFromPitch(p.textContent) - this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
-        //         if(offset < 0){
-        //             offset += 12;
-        //         }
-        //     }
-        //     else{
-        //         //it's not the first cell in the row, transpose based on offset
-        //         var newPitch = (this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i%12]) + offset)%12;
-        //         p.textContent = this.pitchArrays.sharpArray[newPitch];
-        //     }
-        // }
 
         for(var i = 0; i < 196; i++){
             var row = Math.floor(i/14);
@@ -610,7 +568,13 @@ class audio{
             }
             else if (i> 1 && i < 13){
                 //I row - numbers from prime row
-                var pValue = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
+                //var pValue = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
+                var val1 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[i-1]);
+                var val2 = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0]);
+                var pValue = val1-val2; 
+                if(pValue < 0){
+                    pValue += 12;
+                }
                 p.textContent = "I" + pValue;
             }
             else if (i > 183 && i < 195){
@@ -625,11 +589,15 @@ class audio{
             }
             else if (i%14 == 1){
                 //First column of pitches - numbers based on column 0.
-                var index = parseInt(this.ps[i-1].textContent.replace("P",""));
-                p.textContent = this.matrixManager.pitchArrays.sharpArray[index];
+                var offset = parseInt(this.ps[i-1].textContent.replace("P",""));
+                var newPitchNum = (this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[0])+ offset)%12;
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[newPitchNum];
             }
             else{
-
+                var offset = parseInt(this.ps[i - i%14].textContent.replace("P",""));
+                var basePitchNum = this.matrixManager.getNumberFromPitch(this.matrixManager.primeRow.primeRowPitches[(i - (row-1)*14) - 15]);
+                var newPitchNum = (basePitchNum + offset)%12;
+                p.textContent = this.matrixManager.pitchArrays.sharpArray[newPitchNum];
             }
         }
 
