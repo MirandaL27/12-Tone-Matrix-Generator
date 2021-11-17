@@ -39,7 +39,7 @@ Expected Output:
 
 Prime Row: C, C#, D, D#, E, F, F#, G, G#, A, A#, B
 Expected Output:
-![alt text](assets/images.testCase3.png)
+![alt text](assets/images/testCase3.png)
 
 ## Credits/Sources
 Site created by - Miranda Lane
