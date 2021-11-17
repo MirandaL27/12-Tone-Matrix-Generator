@@ -11,6 +11,18 @@ class matrixManager{
     setOnClickForButtons(){
         var manReference = this;
         this.pageContent.addEventListener("click", function() {manReference.onClick(event)});
+        this.pageContent.addEventListener("mouseover", function() 
+        {
+            if(event.target.localName == "button" && (!event.target.getAttribute("isDisabled") || event.target.getAttribute("isDisabled") =="false")){
+                event.target.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+            }
+        }
+        );
+        this.pageContent.addEventListener("mouseout", function(){
+            if(event.target.localName == "button" && (!event.target.getAttribute("isSelected") || event.target.getAttribute("isSelected") == "false")){
+                event.target.style.backgroundImage = null;
+            }
+        });
     }
     onClick(event){
         //differentiate between buttons using their id's and class names
@@ -114,6 +126,7 @@ class matrixManager{
 class button{
     button;
     isDisabled;
+    isSelected = false;
     matrixManager;
     constructor(isDisabledInitially = false, id = null){
         this.isDisabled = isDisabledInitially;
@@ -125,22 +138,28 @@ class button{
     }
     select(){
         this.button.style.backgroundImage = "radial-gradient(white,rgb(126, 117, 117))";
+        this.isSelected = true;
+        this.button.setAttribute("isSelected", "true");
     }
     deselect(){
         this.button.style.backgroundImage = null;
         this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
+        this.isSelected = false;
+        this.button.setAttribute("isSelected", "false");
     }
     disable(){
         this.isDisabled = true;
         this.button.style.backgroundColor = "lightgrey";
         this.button.style.border = "3px solid grey";
         this.button.style.color = "darkgrey";
+        this.button.setAttribute("isDisabled","true");
     }
     enable(){
         this.isDisabled = false;
         this.button.style.backgroundColor = "rgba(126, 117, 117, 0.5)";
         this.button.style.border = "3px solid black";
         this.button.style.color = "black";
+        this.button.setAttribute("isDisabled", "false");
     }
 }
 
@@ -463,41 +482,49 @@ class audio{
         this.styleCellDiv(index)
 
         this.ps.push(document.createElement("p"));
-        this.styleP(index);
+        this.styleP(index, false);
 
         this.cellDivs[index].appendChild(this.ps[index]);
         this.cells[index].appendChild(this.cellDivs[index]);
         this.rows[row].appendChild(this.cells[index]);
     }
     styleContainerDiv(){
-        this.containerDiv.style = "justify-content: center; margin:20px; display:none;"//hide the matrix
+        this.containerDiv.setAttribute("style","justify-content: center; margin:20px; display:none;"); //hide the matrix
     }
     styleTable(){
-        this.table.style = "border: 3px solid blue;";
-        this.table.className = "matrix-table";
+        this.table.setAttribute("style","border: 3px solid blue;");
+        this.table.setAttribute("class","matrix-table");
     }
     styleRow(index){
-        this.rows[index].className = "matrix-row";
+        this.rows[index].setAttribute("class","matrix-row");
     }
     styleButton(index){
         var button = this.playButtons.getPlayButton(index);
-        button.button.type = "submit";
-        button.button.id = "play"+ index;
-        button.button.className = "play-button";
+        button.button.setAttribute("type","submit");
+        button.button.setAttribute("id","play"+ index);
+        button.button.setAttribute("class","play-button");
         button.button.textContent = "Play";
-        button.button.style = "background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;";
+        button.button.setAttribute("style","background-color:rgba(126, 117, 117,0.5); border: 3px solid black; border-radius: 10px; padding: 5px; font-size: 15px;");
     }
     styleCellDiv(index){
-        this.cellDivs[index].style = "display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue";
-        this.cellDivs[index].className = "matrix-div";
+        this.cellDivs[index].setAttribute("style","display: flex; justify-content: center; align-items: center; width:4vw; background-color: mediumslateblue");
+        this.cellDivs[index].setAttribute("class","matrix-div");
     }
     styleCell(index){
-        this.cells[index].className = "matrix-cell";
+        this.cells[index].setAttribute("class","matrix-cell");
     }
-    styleP(index){
-        this.ps[index].id = index;
-        this.ps[index].setAttribute("textContent","0");
-        this.ps[index].style =  "font-size:23px;";
+    styleP(index, fromSpelling, pitch = null, array = null, fontSize = null, fontWeight = null, p = null){
+        if(fromSpelling){
+            p.innerHTML = array[this.matrixManager.getNumberFromPitch(pitch)];
+            p.style.fontSize = fontSize;
+            p.style.fontWeight = fontWeight;
+        }
+        else{
+            this.ps[index].id = index;
+            this.ps[index].setAttribute("textContent","0");
+            this.ps[index].setAttribute("style","font-size:2vw;");
+        }
+        
     }
 
     changeMatrixSpelling(){
@@ -508,22 +535,17 @@ class audio{
 
             var str = p.textContent;
             if(this.matrixManager.pitchArrays.spellingMode == "sharp"){
-                p.textContent = this.matrixManager.pitchArrays.sharpArray[this.matrixManager.getNumberFromPitch(str)];
-                p.style.fontSize = "2.5vw";
-                p.style.fontWeight = "normal";
+                this.styleP(0,true,str,this.matrixManager.pitchArrays.sharpArray, "2.5vw", "normal", p);
             }
             else if (this.matrixManager.pitchArrays.spellingMode == "flat"){
-                p.innerHTML = this.matrixManager.pitchArrays.flatArray[this.matrixManager.getNumberFromPitch(str)];
-                p.style.fontSize = "2.5vw";
-                p.style.fontWeight = "normal";
+                this.styleP(0,true,str,this.matrixManager.pitchArrays.flatArray, "2.5vw", "normal", p);
             }
             else{
-                p.innerHTML = this.matrixManager.pitchArrays.bothArray[this.matrixManager.getNumberFromPitch(str)];
-                p.style.fontSize = "1.5vw";
-                p.style.fontWeight = "bold";
+                this.styleP(0,true,str,this.matrixManager.pitchArrays.bothArray, "1.5vw", "bold", p);
             }      
         }
     }
+
 
     populateMatrix(){
         //compute matrix values and show matrix

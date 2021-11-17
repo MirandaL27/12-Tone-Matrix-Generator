@@ -113,9 +113,9 @@
     padding: 3px;
     font-size: 20px;
  }
- button:hover{
+ /* button:hover{
     background-image: radial-gradient(white,rgb(126, 117, 117));
- }
+ } */
 
  .generate-button{
      text-align: center;
