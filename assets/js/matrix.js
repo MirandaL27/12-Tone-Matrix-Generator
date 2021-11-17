@@ -181,6 +181,7 @@ class pitchArrays {
     setSpellingMode(mode){
         this.spellingMode = mode;
     }
+    //change prime row note spelling to sharps, flats, or both
     respellAccidentals(spelling){
         this.spellingMode = spelling;
         this.resetModeButtons();
@@ -196,6 +197,7 @@ class pitchArrays {
             }
         }
     }
+    //change which spelling mode button is selected
     resetModeButtons(){
         switch(this.spellingMode){
             case "sharp":
@@ -242,25 +244,23 @@ class primeRow {
         }
         return; 
     }
-
+    //keep track of which pitches have been clicked.  swap the two pitches when the second one is clicked.
     getId(id){
         if(this.isFirstClick){
             this.pitch = id;
-            //change style of clicked element to be hover background.
             var index = this.matrixManager.getNumberFromPitch(this.pitch);
             this.selectPitch(index);
             this.isFirstClick = false;
         }
         else{
             this.secondPitch = id;
-            //change style of clicked element to be hover background.
             var index = this.matrixManager.getNumberFromPitch(this.secondPitch);
             this.selectPitch(index);
             this.swapPitches();
             this.isFirstClick = true;
         }
     }
-
+    //change order of pitches to change their positions to swap them.
     swapPitches(){
         var index1 =this.matrixManager.getNumberFromPitch(this.pitch);
         var index2 = this.matrixManager.getNumberFromPitch(this.secondPitch);
@@ -330,17 +330,21 @@ class playButtonManager{
     getPlayButton(index){
         return this.buttons[index];
     }
+    //use audio class to play the row associated with one of the play butons
     playAButton(index){
         if(this.buttons[index].isDisabled){
             return;
         }
         
         this.playingButton = index
+        //disable all of the other buttons that aren't playing so that only one row can be played at a time
         this.disableButtons();
+        //if button is a stop button and is clicked, stop the row from playing and enable all of the other row buttons
         if(this.buttons[index].isStop){
             this.stopAButton(index);
             this.enableButtons();
         }
+        //change the current playing button to a stop button so that the row can be stopped at any time.
         this.buttons[index].changeToStopButton();
         this.audioRef.playPitches(index);
         
@@ -381,6 +385,7 @@ class audio{
         this.matrixManager = manager;
     }
     setup(){
+        //create audio context and oscillator and connect the ocsillator so that it can be played.
         this.context = new AudioContext;
         this.osc = this.context.createOscillator();
         var audioRef = this.matrixManager.matrix.playButtons;
@@ -390,6 +395,7 @@ class audio{
        return;
     }
     populatePitches(row){
+        //fill the pitch array with the frequencies needed to play each note in the row.
         var start =(row + 1)*14 +1;
         for(var i = start ; i<(start + 12) ;i++){
             var p = document.getElementById(i.toString());
@@ -402,20 +408,21 @@ class audio{
     playPitches(row){
         this.setup();
         this.populatePitches(row);
-
+        //play a series of pitches with the oscillator.
         for(var i = 0; i < this.pitchArray.length; i++){
             this.osc.frequency.setValueAtTime(this.pitchArray[i], this.context.currentTime + i);
             if (i == 0){
                 this.osc.start(); 
             }
         }
+        //stop the ocsillator after 12 seconds.
         this.stopPitches(12)
         return;
     }
 
     stopPitches(stopTime){
         this.osc.stop(stopTime);
-        this.pitchArray.length = 0;
+        this.pitchArray.length = 0; // reset pitch array
         return;
     }
 }
@@ -447,15 +454,18 @@ class audio{
         for(var i = 0; i < 14; i++){
             //make 14 table rows
             this.rows.push(document.createElement("tr"));
+            //create play buttons in the first column
             if(i > 0 && i < 13){
                 this.createPlayButton(i-1, i);
             }
+            //create empty cells in the first column
             else{
                 var buffer = document.createElement("td");
                 this.rows[i].appendChild(buffer);
             }
             
             for(var j = 0; j < 14; j++){
+                //make 14 more cells per row
                 var index = (i*14) + j;
                     this.createDefaultCells(index, i);             
             }
@@ -528,7 +538,7 @@ class audio{
     }
 
     changeMatrixSpelling(){
-        //change to sharps, flats or both depending on spellingMode
+        //change matrix cells to sharps, flats or both depending on spellingMode
         for(var i=0;i<144;i++){
             var row = Math.floor(i/12);
             var p = this.ps[i+15+row*2];
@@ -578,7 +588,7 @@ class audio{
                 p.textContent = "P" + pValue;
             }
             else if (i> 1 && i < 13){
-                //I row - numbers from prime row
+                //I row - numbers inverted from prime row
                 var pValue = this.calculateInversion(i-1);
                 p.textContent = "I" + pValue;
             }
@@ -597,6 +607,7 @@ class audio{
                 p.textContent = this.matrixManager.pitchArrays.sharpArray[this.calculateTransposition(i-1, 0)];
             }
             else{
+                //rest of the pitches
                 p.textContent = this.matrixManager.pitchArrays.sharpArray[this.calculateTransposition(i - i%14,(i - (row-1)*14) - 15)];
             }
         }
