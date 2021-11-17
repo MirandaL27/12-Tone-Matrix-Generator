@@ -1,52 +1,77 @@
+ /*General styling start*/
  * {
      margin: 0;
      padding: 0;
      box-sizing: border-box;
  }
 
+ :root{
+    --primary-color: cornflowerblue;
+    --secondary-color: mediumslateblue;
+    --tertiary-color: blue;
+    --color-4: black;
+    --color-5: rgba(126, 117, 117, 0.5);
+    --color-6: darkblue;
+    --color-7: rgb(91, 27, 150);
+}
+
  body{
-     background-color: cornflowerblue;
+     background-color: var(--primary-color);
      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
  }
 
  a{
      text-decoration: none;
      font-size: 25px;
-     color: black;
+     color: var(--color-4);
  }
 
+ h2{
+    background-color: var(--tertiary-color);
+    display: inline-block;
+    color: var(--primary-color);
+    padding:25px 25px 25px 50px;
+    margin-top: 50px;
+    border-radius: 0 15px 15px 0;
+}
+
+button{
+    background-color: var(--color-5);
+    border: 3px solid var(--color-4);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 23px;
+ }
+ /*General styling end*/
+
+ /* Header section styling start*/
  header{
      display: flex;
      justify-content: space-around;
      align-items: center;
      flex-wrap: wrap;
      height: 100px;
-     background-color: mediumslateblue;
+     background-color: var(--secondary-color);
  }
 
+ /* Navbar section styling start*/
  .navbar-container{
      list-style: none;
-     
  }
 
  .navbar-container a {
      padding: 15px;
  }
  .navbar-container a:hover {
-    background-color: blue;
-    color: cornflowerblue;
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
     border-radius: 15px;
 
  }
+ /* Navbar section styling end*/
+ /* Header section styling end*/
 
- .input h2, .who-invented h2, .the-row h2,.matrix-rules h2, .more-info h2, .sources h2{
-     background-color:blue;
-     display: inline-block;
-     color: cornflowerblue;
-     padding:25px 25px 25px 50px;
-     margin-top: 50px;
-     border-radius: 0 15px 15px 0;
- }
+ /*12-Tone-Row section styling start*/
 .input-box{
     display: flex;
     justify-content: space-around;
@@ -55,8 +80,8 @@
 }
 
  .input-container{
-     background-color: rgba(126, 117, 117, 0.5);
-     border: 3px solid black;
+     background-color: var(--color-5);
+     border: 3px solid var(--color-4);
      border-radius: 15px;
      height: 150px;
      width: 80%;
@@ -72,19 +97,13 @@
     align-items: center;
     flex-wrap: wrap;
  }
- .reset-button{
-    background-color:rgba(126, 117, 117, 0.5);
-    border: 3px solid black;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 23px;
- }
+
 
  .pitches{
      height: 120px;
      width: 6%;
-     background-color: mediumslateblue;
-     border: 3px solid blue;
+     background-color: var(--secondary-color);
+     border: 3px solid var(--tertiary-color);
      border-radius: 15px;
      display: flex;
      justify-content: center;
@@ -93,8 +112,8 @@
  }
 
  .pitches:hover{
-     background-image: radial-gradient(mediumslateblue,rgb(91, 27, 150));
-     border: 3px solid darkblue;
+     background-image: radial-gradient(var(--secondary-color),var(--color-7));
+     border: 3px solid var(--color-6);
  }
 
 
@@ -107,36 +126,22 @@
  }
 
  .mode-button{
-    background-color:rgba(126, 117, 117, 0.5);
-    border: 3px solid black;
-    border-radius: 10px;
     padding: 3px;
     font-size: 20px;
  }
- button:hover{
-    background-image: radial-gradient(white,rgb(126, 117, 117));
- }
+/*12-Tone-Row section styling end*/
 
+/*Generate button section styling start*/
  .generate-button{
      text-align: center;
  }
  
  .gen{
-    background-color:rgba(126, 117, 117, 0.5);
-    border: 3px solid black;
-    border-radius: 10px;
-    padding: 10px;
     font-size: 30px;
  }
+/*Generate button section styling end*/
 
- .print-button{
-    background-color:rgba(126, 117, 117, 0.5);
-    border: 3px solid black;
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 23px;
- }
-
+/*Media queries*/
  @media print{
      .input {
          display:none;
@@ -156,17 +161,11 @@
          border-collapse: collapse;
      }
      .matrix-cell{
-        border: 1px solid black;
+        border: 1px solid var(--color-4);
      }
 
  }
 
- /* @media screen and (max-width: 980px) {
-     header h1{
-         color: red;
-     }
-
-} */
 
 @media screen and (max-width: 768px) {
     .pitches{

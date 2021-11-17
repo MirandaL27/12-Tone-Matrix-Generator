@@ -2,6 +2,7 @@ span{
  font-size: 15px;
 }
 
+/*Who Invented It section styling start*/
 .who-container {
     display: flex;
     justify-content: space-around;
@@ -13,17 +14,20 @@ span{
 .who-container p {
     width: 50%;
     font-size: 20px;
-    background-color: mediumslateblue;
+    background-color: var(--secondary-color);
     padding: 10px;
     border-radius: 15px;
-    border: 3px solid blue;
+    border: 3px solid var(--tertiary-color);
 }
 
 .who-container img{
-    border: 3px solid blue;
+    flex-grow: 1;
+    border: 3px solid var(--tertiary-color);
     border-radius: 15px;
 }
+/*Who Invented It section styling end*/
 
+/*The 12-Tone Row section styling start*/
 .the-row-container{
     display: flex;
     justify-content: space-around;
@@ -33,10 +37,10 @@ span{
 .transformation-instructions-container {
     width: 45%;
     font-size: 20px;
-    background-color: mediumslateblue;
+    background-color: var(--secondary-color);
     padding: 10px 10px 10px 30px;
     border-radius: 15px;
-    border: 3px solid blue;
+    border: 3px solid var(--tertiary-color);
 }
 
 .row-transformations-container{
@@ -51,10 +55,12 @@ span{
 
 .row-transformations-container img{
     width: 100%;
-    border: 3px solid blue;
+    border: 3px solid var(--tertiary-color);
     border-radius: 15px;
 }
+/*The 12-Tone Row section styling end*/
 
+/*Rules of the 12-tone matrix section styling start*/
 .rules-container{
     display: flex;
     justify-content: space-around;
@@ -64,22 +70,24 @@ span{
 }
 
 .written-rules-container, .diagram-container{
-    width: 45%;
-    
+    width: 45%;  
 }
 
 .written-rules-container{
     font-size: 20px;
-    background-color: mediumslateblue;
-    border: 3px solid blue;
+    background-color: var(--secondary-color);
+    border: 3px solid var(--tertiary-color);
     border-radius: 15px;
     padding: 10px 10px 10px 30px;
 }
+/*Rules of the 12-tone matrix section styling end*/
+
+/*Additional Information section styling start*/
 .more-info-container{
     margin: 50px 50px 50px 50px;
     padding: 10px 10px 10px 30px;
-    background-color: mediumslateblue;
-    border: 3px solid blue;
+    background-color: var(--secondary-color);
+    border: 3px solid var(--tertiary-color);
     border-radius: 15px;
 
 }
@@ -88,22 +96,26 @@ span{
 }
 
 .more-info-container ul li a:hover{
-    background-color: blue;
-    color:cornflowerblue;
+    background-color: var(--tertiary-color);
+    color: var(--primary-color);
     border-radius: 10px;
 }
+/*Additional Information section styling end*/
 
+/*Sources section styling start*/
 .sources-container{
     display: flex;
     flex-wrap: wrap;
     margin: 50px 50px 50px 50px;
     padding: 10px 10px 10px 30px;
-    background-color: mediumslateblue;
-    border: 3px solid blue;
+    background-color: var(--secondary-color);
+    border: 3px solid var(--tertiary-color);
     border-radius: 15px;
     font-size: 20px;
 }
+/*Sources section styling end*/
 
+/*Media queries*/
 @media screen and (max-width: 980px) {
     .diagram-container{
         width: 40%;
