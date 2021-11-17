@@ -21,6 +21,7 @@ span{
 }
 
 .who-container img{
+    flex-grow: 1;
     border: 3px solid var(--tertiary-color);
     border-radius: 15px;
 }
@@ -69,8 +70,7 @@ span{
 }
 
 .written-rules-container, .diagram-container{
-    width: 45%;
-    
+    width: 45%;  
 }
 
 .written-rules-container{
